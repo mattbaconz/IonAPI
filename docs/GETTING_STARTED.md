@@ -872,3 +872,20 @@ public void updateBoard(Player player) {
 ---
 
 **Happy coding with IonAPI!** 🚀
+
+---
+
+## 💬 Community & Support
+
+<div align="center">
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/VQjTVKjs46)
+[![GitHub](https://img.shields.io/badge/GitHub-mattbaconz-181717?style=for-the-badge&logo=github)](https://github.com/mattbaconz)
+
+**Need help?** Join our Discord server!
+
+**Support the project:**
+- ☕ [Ko-fi](https://ko-fi.com/mbczishim/tip)
+- 💰 [PayPal](https://www.paypal.com/paypalme/MatthewWatuna)
+
+</div>

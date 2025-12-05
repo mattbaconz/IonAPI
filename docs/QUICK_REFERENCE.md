@@ -451,7 +451,19 @@ dependencies {
 
 ## Documentation
 
-- Full docs: `docs/NEW_FEATURES.md`
-- Migration guide: `docs/MIGRATION_GUIDE.md`
-- Examples: `examples/ComprehensiveExample.java`
-- API reference: `docs/API_REFERENCE.md`
+- [Getting Started](GETTING_STARTED.md)
+- [API Reference](API_REFERENCE.md)
+- [Examples](EXAMPLES.md)
+- [Migration Guide](MIGRATION_GUIDE.md)
+- [Folia Guide](FOLIA_GUIDE.md)
+
+---
+
+## 💬 Community & Support
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.com/invite/VQjTVKjs46)
+[![GitHub](https://img.shields.io/badge/GitHub-mattbaconz-181717?style=flat-square&logo=github)](https://github.com/mattbaconz)
+
+**Need help?** Join our [Discord](https://discord.com/invite/VQjTVKjs46)!
+
+**Support:** [Ko-fi](https://ko-fi.com/mbczishim/tip) • [PayPal](https://www.paypal.com/paypalme/MatthewWatuna)

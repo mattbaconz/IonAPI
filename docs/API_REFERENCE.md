@@ -521,3 +521,27 @@ scheduler.runAsync(() -> {
     }
 });
 ```
+
+
+---
+
+## 📚 More Resources
+
+- [Getting Started](GETTING_STARTED.md) - Complete tutorial
+- [Examples](EXAMPLES.md) - Code examples
+- [Quick Reference](QUICK_REFERENCE.md) - Cheatsheet
+- [Migration Guide](MIGRATION_GUIDE.md) - Migrate from Bukkit
+- [Folia Guide](FOLIA_GUIDE.md) - Folia compatibility
+
+---
+
+## 💬 Community & Support
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.com/invite/VQjTVKjs46)
+[![GitHub](https://img.shields.io/badge/GitHub-mattbaconz-181717?style=flat-square&logo=github)](https://github.com/mattbaconz)
+
+**Need help?** Join our [Discord](https://discord.com/invite/VQjTVKjs46)!
+
+**Support the project:**
+- ☕ [Ko-fi](https://ko-fi.com/mbczishim/tip)
+- 💰 [PayPal](https://www.paypal.com/paypalme/MatthewWatuna)
