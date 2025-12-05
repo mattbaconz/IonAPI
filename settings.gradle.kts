@@ -1,0 +1,17 @@
+rootProject.name = "IonAPI"
+
+include("ion-api")
+include("ion-core")
+include("ion-gui")
+include("ion-item")
+include("ion-ui")
+include("ion-tasks")
+include("ion-database")
+include("ion-proxy")
+include("ion-npc")
+include("ion-placeholder")
+include("ion-test")
+include("ion-inject")
+include("ion-compat")
+include("platforms:ion-paper")
+include("platforms:ion-folia")

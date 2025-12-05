@@ -1,0 +1,6 @@
+{
+    "platform": "folia",
+    "dependencies": [
+        "ion-core"
+    ]
+}

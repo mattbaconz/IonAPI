@@ -1,0 +1,6 @@
+{
+  "platform": "paper",
+  "dependencies": [
+    "ion-core"
+  ]
+}

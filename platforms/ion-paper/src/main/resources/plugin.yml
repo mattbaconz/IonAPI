@@ -1,0 +1,7 @@
+name: IonAPI
+version: 1.0.0-SNAPSHOT
+main: com.ionapi.paper.IonPaperPlugin
+api-version: 1.20
+description: A comprehensive, multi-platform Minecraft plugin API
+author: IonAPI Team
+website: https://github.com/ionapi/ionapi
