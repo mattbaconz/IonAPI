@@ -1,10 +1,96 @@
-# IonAPI
+<div align="center">
 
-A comprehensive, multi-platform Minecraft plugin API that provides a unified interface for Paper and Folia servers.
+# ⚡ IonAPI
 
-## Installation
+### Modern, Multi-Platform Minecraft Plugin API
 
-### Gradle (Kotlin DSL)
+*Write less code. Build better plugins. Support Paper & Folia.*
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/VQjTVKjs46)
+[![GitHub](https://img.shields.io/badge/GitHub-mattbaconz-181717?style=for-the-badge&logo=github)](https://github.com/mattbaconz)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/mbczishim/tip)
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/MatthewWatuna)
+
+**Reduce boilerplate by 50-80%** • **Unified Paper/Folia API** • **Modern Fluent Design**
+
+[📚 Documentation](docs/GETTING_STARTED.md) • [🚀 Quick Start](#-quick-start) • [💡 Examples](docs/EXAMPLES.md) • [🤝 Contributing](CONTRIBUTING.md)
+
+</div>
+
+---
+
+## ✨ Why IonAPI?
+
+```java
+// ❌ Old Way (Bukkit API) - 15+ lines
+ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
+ItemMeta meta = sword.getItemMeta();
+if (meta != null) {
+    meta.setDisplayName(ChatColor.RED + "Legendary Sword");
+    List<String> lore = new ArrayList<>();
+    lore.add(ChatColor.GRAY + "Forged in dragon fire");
+    meta.setLore(lore);
+    meta.addEnchant(Enchantment.SHARPNESS, 5, false);
+    meta.setUnbreakable(true);
+}
+sword.setItemMeta(meta);
+
+// ✅ New Way (IonAPI) - 6 lines
+ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
+    .name("<red>Legendary Sword")
+    .lore("<gray>Forged in dragon fire")
+    .enchant(Enchantment.SHARPNESS, 5)
+    .unbreakable()
+    .build();
+```
+
+**60% less code. 100% more readable. Fully type-safe.**
+
+---
+
+## 🎯 Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🔥 Core Features
+- ⚡ **Unified Scheduler** - Paper & Folia compatible
+- 🎮 **Modern Commands** - Fluent registration
+- ⚙️ **Smart Config** - Type-safe configuration
+- 📢 **Event Bus** - Custom event system
+- 🛠️ **Utilities** - MiniMessage support
+
+</td>
+<td width="50%">
+
+### 🆕 Extended Features
+- 🎨 **Item Builder** - Fluent ItemStack creation
+- 📦 **GUI System** - Interactive menus
+- 📊 **Scoreboard/BossBar** - Dynamic UI
+- 🔗 **Task Chains** - Async/sync workflows
+- 💾 **Database ORM** - Simple data persistence
+
+</td>
+</tr>
+</table>
+
+### 🌟 Additional Modules
+- 🔌 **Cross-Server Messaging** - Velocity/BungeeCord support
+- 👻 **Packet NPCs** - Lightweight, zero-tick NPCs
+- 🏷️ **PlaceholderAPI Bridge** - Auto-registration
+- 💉 **Dependency Injection** - Clean architecture
+- 🧪 **Unit Testing** - Mock framework
+- 🔄 **Compatibility Layer** - Java 8+ polyfills
+
+---
+
+## 📦 Installation
+
+> 💡 **Easy Shading**: IonAPI is designed to be easily shadable! Just add the Shadow plugin and dependency - no complex configuration needed.
+
+### Gradle (Kotlin DSL) - Recommended ⭐
+
 ```kotlin
 plugins {
     id("com.gradleup.shadow") version "8.3.0"
@@ -16,16 +102,23 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.YourOrg:IonAPI:1.0.0")
+    // IonAPI automatically shades into your plugin!
+    implementation("com.github.mattbaconz:IonAPI:1.0.0")
 }
 
 tasks.shadowJar {
-    // IMPORTANT: Relocate to avoid conflicts with other plugins
+    // ⚠️ IMPORTANT: Relocate to avoid conflicts!
     relocate("com.ionapi", "your.plugin.libs.ionapi")
+    
+    // Optional: Minimize JAR size
+    minimize()
 }
 ```
 
+**✨ That's it!** IonAPI is designed to be easily shadable. Just add the dependency and Shadow plugin handles the rest!
+
 ### Gradle (Groovy)
+
 ```groovy
 plugins {
     id 'com.gradleup.shadow' version '8.3.0'
@@ -37,7 +130,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.YourOrg:IonAPI:1.0.0'
+    implementation 'com.github.mattbaconz:IonAPI:1.0.0'
 }
 
 shadowJar {
@@ -46,6 +139,7 @@ shadowJar {
 ```
 
 ### Maven
+
 ```xml
 <repositories>
     <repository>
@@ -56,13 +150,12 @@ shadowJar {
 
 <dependencies>
     <dependency>
-        <groupId>com.github.YourOrg</groupId>
+        <groupId>com.github.mattbaconz</groupId>
         <artifactId>IonAPI</artifactId>
         <version>1.0.0</version>
     </dependency>
 </dependencies>
 
-<!-- Add shade plugin for relocation -->
 <build>
     <plugins>
         <plugin>
@@ -88,341 +181,80 @@ shadowJar {
 </build>
 ```
 
-> ⚠️ **Important**: Always relocate IonAPI to avoid conflicts when multiple plugins use different versions!
+> 💡 **Pro Tip**: Always relocate IonAPI to avoid conflicts when multiple plugins use different versions!
 
-## Features
+### 🎯 Shading Made Easy
 
-### Core Features
+IonAPI is **designed for easy adoption** with minimal configuration:
 
-#### 🕒 Unified Scheduler
-Cross-platform scheduler that abstracts Paper and Folia's threading differences:
-```java
-// Context-free (works everywhere, uses global scheduler on Folia)
-plugin.getScheduler().run(() -> {
-    // General task
-});
+**✅ What you get:**
+- 📦 **Single JAR** - Everything bundled together
+- 🔒 **Conflict-free** - Proper relocation prevents issues
+- 🪶 **Lightweight** - Only ~500KB when shaded
+- ⚡ **Fast** - No runtime dependencies to load
+- 🎯 **Simple** - Just add Shadow plugin and dependency
 
-// Context-aware (optimal for Folia - runs on entity's region thread)
-Player player = event.getPlayer();
-plugin.getScheduler().runAt(player, () -> {
-    player.damage(5.0); // Safe and performant on Folia
-});
-
-plugin.getScheduler().runLater(() -> {
-    // Delayed execution
-}, 20, TimeUnit.SECONDS);
-```
-
-#### ⚡ Modern Command Framework
-Simple, fluent command registration:
-```java
-CommandRegistry registry = plugin.getCommandRegistry();
-registry.register(new IonCommand() {
-    @Override
-    public boolean execute(CommandContext ctx) {
-        ctx.reply("Hello, " + ctx.getSender() + "!");
-        return true;
-    }
-    
-    @Override
-    public String getName() { return "hello"; }
-});
-```
-
-#### ⚙️ Configuration System
-Easy configuration management:
-```java
-IonConfig config = plugin.getConfigProvider().getConfig();
-String host = config.getString("database.host", "localhost");
-int port = config.getInt("database.port", 3306);
-```
-
-#### 📢 Event Bus
-Custom event system with priority support:
-```java
-plugin.getEventBus().subscribe(MyCustomEvent.class, event -> {
-    // Handle event
-});
-```
-
-#### 🛠️ Utilities
-Common utilities for plugin development:
-```java
-Component message = TextUtil.parse("<green>Hello <bold>World</bold>!");
-```
-
-### 🆕 Extended Features
-
-#### 🎨 Item Builder
-Fluent API for creating ItemStacks:
-```java
-ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
-    .name("<gradient:red:blue>Legendary Sword")
-    .lore("Deals massive damage", "", "§7Rarity: §6Legendary")
-    .enchant(Enchantment.SHARPNESS, 5)
-    .unbreakable()
-    .glow()
-    .build();
-```
-
-#### 📦 GUI System
-Create interactive inventory menus:
-```java
-IonGui gui = IonGui.builder()
-    .title("<gold><bold>Shop Menu")
-    .rows(3)
-    .item(10, diamondItem, click -> {
-        click.getPlayer().sendMessage("Bought diamond!");
-        click.close();
-    })
-    .fillBorder(borderItem)
-    .build();
-gui.open(player);
-```
-
-#### ✏️ Text Input (Anvil & Sign)
-Capture player text input easily:
-```java
-// Anvil-based input
-InputGui.create(plugin)
-    .title("Enter player name")
-    .placeholder("Type here...")
-    .onComplete((player, input) -> {
-        player.sendMessage("You entered: " + input);
-    })
-    .open(player);
-
-// Sign-based input
-SignInput.create(plugin)
-    .lines("", "Enter amount", "above", "")
-    .onInput((player, input) -> {
-        int amount = Integer.parseInt(input);
-        giveItems(player, amount);
-    })
-    .open(player);
-
-// Async/Future style
-SignInput.create(plugin)
-    .lines("", "Enter name", "", "")
-    .required()
-    .openForInput(player)
-    .thenAccept(name -> processName(name));
-```
-
-#### 📊 Scoreboard & BossBar
-Modern UI components:
-```java
-// Scoreboard
-IonScoreboard board = IonScoreboard.create(player)
-    .title("<gold><bold>Server Stats")
-    .line("Players: " + count)
-    .dynamicLine(1, p -> "Health: " + p.getHealth())
-    .autoUpdate(20L)
-    .show();
-
-// BossBar
-IonBossBar bar = IonBossBar.create("<red>Boss Health")
-    .progress(0.75)
-    .color(BossBar.Color.RED)
-    .show(player);
-```
-
-#### 🔗 Task Chains
-Build complex async/sync workflows:
-```java
-TaskChain.create(plugin)
-    .async(() -> fetchFromDatabase(uuid))
-    .syncAt(player, data -> applyData(data))
-    .delay(5, TimeUnit.SECONDS)
-    .sync(() -> broadcastMessage())
-    .exceptionally(ex -> handleError(ex))
-    .execute();
-```
-
-#### 💾 Database Layer
-Simple ORM with async support:
-```java
-@Table("players")
-public class PlayerData {
-    @PrimaryKey
-    private UUID uuid;
-    private String name;
-    private int level;
-}
-
-// Query
-PlayerData data = db.find(PlayerData.class, playerUuid);
-data.setLevel(data.getLevel() + 1);
-db.save(data);
-
-// Async
-db.findAsync(PlayerData.class, uuid)
-    .thenAccept(data -> processData(data));
-```
-
-#### 🔌 Cross-Server Messaging (IonProxy)
-Simple pub/sub messaging for Velocity/BungeeCord networks:
-```java
-IonMessenger messenger = IonProxy.messenger(plugin);
-
-// Subscribe to channels
-messenger.subscribe("my:channel", (player, message) -> {
-    getLogger().info("Received: " + message);
-});
-
-// Broadcast to all servers
-messenger.broadcast("my:channel", "Hello from " + serverName);
-
-// Optional Redis support
-IonMessenger redis = IonProxy.redis(plugin, "localhost", 6379);
-```
-
-#### 👻 Packet-Based NPCs (IonNPC)
-Lightweight, zero-tick NPCs using packets:
-```java
-IonNPC npc = IonNPC.builder(plugin)
-    .location(spawnLocation)
-    .name("<gold>Shop Keeper")
-    .skin("Notch")
-    .lookAtPlayer(true)
-    .onClick(player -> openShop(player))
-    .persistent(true)
-    .build();
-
-npc.showAll();  // Show to all players
-npc.destroy();  // Remove NPC
-```
-
-#### 🏷️ PlaceholderAPI Bridge
-Auto-register placeholders without manual PAPI setup:
-```java
-IonPlaceholderRegistry.create(plugin)
-    .register(SimplePlaceholder.create("myplugin")
-        .staticPlaceholder("server", "My Server")
-        .placeholder("name", player -> player.getName())
-        .placeholder("level", player -> String.valueOf(getLevel(player)))
-        .build())
-    .build();
-// Creates: %myplugin_server%, %myplugin_name%, %myplugin_level%
-```
-
-#### 💉 Dependency Injection
-Clean up your main classes with micro-DI:
-```java
-// In onEnable()
-IonInjector injector = IonInjector.create(this)
-    .register(PlayerService.class)
-    .register(EconomyService.class)
-    .build();
-
-// Create with injection
-MyCommand cmd = injector.create(MyCommand.class);
-
-// In your command
-public class MyCommand implements IonCommand {
-    @Inject private PlayerService playerService;
-    @Inject private EconomyService economy;
-    
-    public boolean execute(CommandContext ctx) {
-        // Dependencies are automatically injected!
-    }
-}
-```
-
-#### 🧪 Unit Testing (IonTest)
-Test your plugin without a server:
-```java
-@Test
-void testMyFeature() {
-    MockIonPlugin plugin = IonTest.createMockPlugin("TestPlugin");
-    plugin.getMockConfig().set("max-players", 50);
-    
-    MyService service = new MyService(plugin);
-    service.initialize();
-    
-    // Verify scheduler was used
-    assertEquals(1, plugin.getMockScheduler().getPendingTasks().size());
-    
-    // Execute pending tasks
-    plugin.getMockScheduler().runPendingTasks();
-    
-    // Verify logging
-    assertTrue(plugin.getMockLogger().hasMessage("Initialized"));
-}
-```
-
-#### 🔄 Compatibility Layer (IonCompat)
-Write modern Java code that runs on older JVMs:
-```java
-// Instead of List.of() (Java 9+)
-List<String> list = IonList.of("a", "b", "c");
-Map<String, Integer> map = IonMap.of("one", 1, "two", 2);
-Set<String> set = IonSet.of("x", "y", "z");
-
-// String utilities (Java 11+ backports)
-boolean blank = IonCompat.isBlank("  ");      // true
-String repeated = IonCompat.repeat("ab", 3);  // "ababab"
-
-// Version-agnostic packets
-IonPacket.actionBar(player, "<gold>Welcome!");
-IonPacket.title(player, "<red>Alert!", "<gray>Check your inventory", 10, 70, 20);
-IonPacket.tabList(player, "<gold>Server", "<gray>Players: " + count);
-
-// Server version detection
-if (ServerVersion.isAtLeast(1, 20)) { /* use 1.20+ features */ }
-if (ServerVersion.isFolia()) { /* use Folia-specific code */ }
-```
-
-#### 🔀 Unified Events (Cross-Version)
-Write event handlers once, they work on ALL server versions:
-```java
-// Register unified listeners
-IonEvents.register(plugin, new MyListener());
-
-public class MyListener implements Listener {
-    // Works on 1.8-1.21+ - bridges legacy and modern events automatically
-    @IonEventHandler
-    public void onPickup(IonEntityPickupItemEvent event) {
-        Player player = event.getPlayer();
-        ItemStack item = event.getItemStack();
-        // Same code works everywhere!
-    }
-    
-    // Only fires on 1.9+ (graceful degradation on 1.8)
-    @IonEventHandler
-    public void onSwap(IonPlayerSwapHandItemsEvent event) {
-        // Handle off-hand swap
-    }
-}
-```
-
-## Quick Start
-
-### Adding IonAPI to Your Project
-
-**Gradle (Kotlin DSL)**
+**Example: Complete build.gradle.kts**
 ```kotlin
+plugins {
+    java
+    id("com.gradleup.shadow") version "8.3.0"
+}
+
+group = "com.example"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://jitpack.io")
+}
+
 dependencies {
-    compileOnly("com.ionapi:ion-api:1.0.0-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    implementation("com.github.mattbaconz:IonAPI:1.0.0")
+}
+
+tasks {
+    shadowJar {
+        archiveClassifier.set("")
+        relocate("com.ionapi", "${project.group}.libs.ionapi")
+        minimize() // Optional: Reduce JAR size
+    }
+    
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 ```
 
-### Creating a Plugin
+**Build your plugin:**
+```bash
+./gradlew shadowJar
+# Your plugin JAR with IonAPI included: build/libs/YourPlugin-1.0.0.jar
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Create Your Plugin
 
 ```java
+import com.ionapi.api.IonPlugin;
+
 public class MyPlugin implements IonPlugin {
     
     @Override
     public void onEnable() {
-        getLogger().info("MyPlugin enabled!");
+        getLogger().info("🚀 MyPlugin enabled!");
         
-        // Use scheduler
-        getScheduler().run(() -> {
-            getLogger().info("Task executed!");
-        });
-        
-        // Register command
-        getCommandRegistry().register(new MyCommand());
+        // Register commands
+        getCommandRegistry().register(new HelloCommand());
         
         // Load config
         IonConfig config = getConfigProvider().getConfig();
@@ -431,7 +263,8 @@ public class MyPlugin implements IonPlugin {
     
     @Override
     public void onDisable() {
-        getLogger().info("MyPlugin disabled!");
+        getScheduler().cancelAll();
+        getLogger().info("👋 MyPlugin disabled!");
     }
     
     @Override
@@ -441,62 +274,266 @@ public class MyPlugin implements IonPlugin {
 }
 ```
 
-## Modules
+### 2️⃣ Create a Command
 
-### Core Modules
-- **ion-api**: Core API interfaces
-- **ion-core**: Base implementations
-- **platforms/ion-paper**: Paper-specific implementation
-- **platforms/ion-folia**: Folia-specific implementation
-
-### Feature Modules
-- **ion-item**: Fluent ItemStack builder
-- **ion-gui**: Interactive inventory GUI system (includes SignInput & InputGui)
-- **ion-ui**: Scoreboard and BossBar components
-- **ion-tasks**: Async/sync task chain builder
-- **ion-database**: Database ORM layer with connection pooling
-- **ion-proxy**: Cross-server messaging (Plugin Messages & Redis)
-- **ion-npc**: Lightweight packet-based NPCs
-- **ion-placeholder**: PlaceholderAPI bridge with auto-registration
-- **ion-inject**: Lightweight dependency injection
-- **ion-test**: Mock framework for unit testing
-- **ion-compat**: Compatibility layer (Java 8 polyfills, version-agnostic packets)
-
-## Platform Compatibility
-
-| Feature | Paper | Folia |
-|---------|-------|-------|
-| Scheduler | ✅ Main thread | ✅ Region-aware |
-| Commands | ✅ | ✅ |
-| Configuration | ✅ | ✅ |
-| Events | ✅ | ✅ |
-| Utilities | ✅ | ✅ |
-
-## Building
-
-```bash
-./gradlew build
+```java
+public class HelloCommand implements IonCommand {
+    @Override
+    public boolean execute(CommandContext ctx) {
+        String name = ctx.getArg(0, "World");
+        ctx.reply("<green>Hello, <bold>" + name + "</bold>!");
+        return true;
+    }
+    
+    @Override
+    public String getName() { return "hello"; }
+    @Override
+    public String getDescription() { return "Greets a player"; }
+    @Override
+    public String getUsage() { return "/hello [name]"; }
+    @Override
+    public String getPermission() { return "myplugin.hello"; }
+}
 ```
 
-## Documentation
+### 3️⃣ Build & Run
 
-- **[Getting Started Guide](docs/GETTING_STARTED.md)** - Quick start tutorial
-- **[API Reference](docs/API_REFERENCE.md)** - Complete API documentation
-- **[New Features Guide](docs/NEW_FEATURES.md)** - 🆕 Extended features documentation
-- **[Examples](docs/EXAMPLES.md)** - Real-world usage examples
-- **[Folia Guide](docs/FOLIA_GUIDE.md)** - Folia compatibility guide
-- **[Contributing](CONTRIBUTING.md)** - How to contribute to IonAPI
+```bash
+./gradlew shadowJar
+# Copy build/libs/YourPlugin-1.0.0-all.jar to server/plugins/
+```
 
-## License
+**That's it!** 🎉
 
-Open Source - MIT License
+---
 
-## Contributing
+## 💡 Feature Showcase
 
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) and check out the [API Reference](docs/API_REFERENCE.md) before getting started.
+### 🎨 Item Builder
 
-## Support
+```java
+ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
+    .name("<gradient:red:blue>Legendary Sword")
+    .lore(
+        "<gray>Forged in dragon fire",
+        "",
+        "<gold>⚔ Legendary Weapon"
+    )
+    .enchant(Enchantment.SHARPNESS, 5)
+    .enchant(Enchantment.FIRE_ASPECT, 2)
+    .unbreakable()
+    .glow()
+    .build();
+```
 
-- 📖 [Documentation](docs/)
-- 💬 GitHub Issues
-- 🌟 Star this repo if you find it useful!
+### 📦 GUI System
+
+```java
+IonGui.builder()
+    .title("<gold><bold>✨ Shop Menu")
+    .rows(3)
+    .item(10, diamondItem, click -> {
+        Player player = click.getPlayer();
+        if (buyItem(player, 100)) {
+            player.sendMessage("<green>✓ Purchased!");
+            click.close();
+        } else {
+            player.sendMessage("<red>✗ Not enough money!");
+        }
+    })
+    .fillBorderBuilder(IonItem.of(Material.GRAY_STAINED_GLASS_PANE, " "))
+    .build()
+    .open(player);
+```
+
+### 📊 Dynamic Scoreboard
+
+```java
+IonScoreboard.create(player)
+    .title("<gold><bold>⚡ Server Stats")
+    .line("<gray>━━━━━━━━━━━━━━")
+    .line("")
+    .line("")
+    .dynamicLine(1, p -> "<yellow>Players: <white>" + Bukkit.getOnlinePlayers().size())
+    .dynamicLine(2, p -> "<green>Health: <white>" + (int) p.getHealth() + "❤")
+    .autoUpdate(20L)  // Updates every second
+    .show();
+```
+
+### 🔗 Task Chains (Async/Sync)
+
+```java
+TaskChain.create(plugin)
+    .async(() -> database.loadPlayerData(uuid))
+    .syncAt(player, data -> {
+        player.setLevel(data.level);
+        player.sendMessage("<green>✓ Data loaded!");
+    })
+    .delay(2, TimeUnit.SECONDS)
+    .syncAt(player, () -> player.sendMessage("<gold>Welcome back!"))
+    .exceptionally(ex -> player.sendMessage("<red>✗ Failed to load data!"))
+    .execute();
+```
+
+### 💾 Database ORM
+
+```java
+@Table("players")
+public class PlayerData {
+    @PrimaryKey private UUID uuid;
+    @Column private String name;
+    @Column private int level;
+}
+
+// Simple queries
+PlayerData data = db.find(PlayerData.class, playerUuid);
+data.setLevel(data.getLevel() + 1);
+db.save(data);
+
+// Async support
+db.findAsync(PlayerData.class, uuid)
+    .thenAccept(data -> processData(data));
+```
+
+---
+
+## 🎯 Platform Compatibility
+
+| Feature | Paper | Folia |
+|---------|:-----:|:-----:|
+| ⚡ Scheduler | ✅ Main thread | ✅ Region-aware |
+| 🎮 Commands | ✅ | ✅ |
+| ⚙️ Configuration | ✅ | ✅ |
+| 📢 Events | ✅ | ✅ |
+| 🛠️ Utilities | ✅ | ✅ |
+| 🎨 Item Builder | ✅ | ✅ |
+| 📦 GUI System | ✅ | ✅ |
+| 📊 UI Components | ✅ | ✅ |
+| 🔗 Task Chains | ✅ | ✅ Folia-optimized |
+
+---
+
+## 📚 Documentation
+
+<table>
+<tr>
+<td width="33%">
+
+### 📖 Getting Started
+- [Quick Start Guide](docs/GETTING_STARTED.md)
+- [API Reference](docs/API_REFERENCE.md)
+- [Quick Reference](docs/QUICK_REFERENCE.md)
+
+</td>
+<td width="33%">
+
+### 💡 Learn More
+- [Feature Guide](docs/NEW_FEATURES.md)
+- [Examples](docs/EXAMPLES.md)
+- [Folia Guide](docs/FOLIA_GUIDE.md)
+
+</td>
+<td width="33%">
+
+### 🔧 Advanced
+- [Migration Guide](docs/MIGRATION_GUIDE.md)
+- [Technical Analysis](docs/TECHNICAL_ANALYSIS.md)
+- [AI IDE Guide](IONAPI_AI_GUIDE.md)
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🏗️ Project Structure
+
+```
+IonAPI/
+├── 🎯 ion-api/          Core API interfaces
+├── ⚙️ ion-core/         Base implementations
+├── 🎨 ion-item/         Item Builder
+├── 📦 ion-gui/          GUI System
+├── 📊 ion-ui/           Scoreboard & BossBar
+├── 🔗 ion-tasks/        Task Chains
+├── 💾 ion-database/     Database ORM
+├── 🔌 ion-proxy/        Cross-server messaging
+├── 👻 ion-npc/          Packet NPCs
+├── 🏷️ ion-placeholder/  PlaceholderAPI bridge
+├── 💉 ion-inject/       Dependency injection
+├── 🧪 ion-test/         Testing framework
+├── 🔄 ion-compat/       Compatibility layer
+└── 🖥️ platforms/        Paper & Folia implementations
+```
+
+---
+
+## 🤝 Contributing
+
+We love contributions! Whether it's:
+
+- 🐛 **Bug reports**
+- 💡 **Feature requests**
+- 📝 **Documentation improvements**
+- 🔧 **Code contributions**
+
+Check out our [Contributing Guide](CONTRIBUTING.md) to get started!
+
+---
+
+## 💖 Support the Project
+
+If IonAPI helps you build better plugins, consider supporting development:
+
+<div align="center">
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20Me%20a%20Coffee-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/mbczishim/tip)
+[![PayPal](https://img.shields.io/badge/PayPal-Donate-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/MatthewWatuna)
+
+</div>
+
+---
+
+## 🌟 Community
+
+<div align="center">
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Our%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/VQjTVKjs46)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow%20@mattbaconz-181717?style=for-the-badge&logo=github)](https://github.com/mattbaconz)
+
+**Join our Discord for:**
+- 💬 Plugin development help
+- 🐛 Bug reports & support
+- 💡 Feature discussions
+- 🎉 Community showcase
+
+</div>
+
+---
+
+## 📜 License
+
+IonAPI is open source software licensed under the [MIT License](LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+Built with ❤️ by [mattbaconz](https://github.com/mattbaconz)
+
+Special thanks to:
+- 🎮 **PaperMC** - For the amazing Paper & Folia platforms
+- 🎨 **Adventure API** - For modern text components
+- 🌟 **All contributors** - For making IonAPI better
+
+---
+
+<div align="center">
+
+### ⭐ Star this repo if you find it useful!
+
+**Made with ❤️ for the Minecraft plugin development community**
+
+[📚 Documentation](docs/GETTING_STARTED.md) • [💡 Examples](docs/EXAMPLES.md) • [🐛 Report Bug](https://github.com/mattbaconz/IonAPI/issues) • [💬 Discord](https://discord.com/invite/VQjTVKjs46)
+
+</div>
