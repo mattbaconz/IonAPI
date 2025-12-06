@@ -4,7 +4,7 @@ plugins {
 
 allprojects {
     group = "com.ionapi"
-    version = "1.0.0-SNAPSHOT"
+    version = "1.1.0"
 
     repositories {
         mavenCentral()
@@ -26,3 +26,7 @@ subprojects {
         options.release.set(21)
     }
 }
+
+// Note: All-in-one JAR is handled by JitPack automatically
+// Developers can use: implementation("com.github.mattbaconz:IonAPI:1.1.0")
+// JitPack will bundle all modules together
