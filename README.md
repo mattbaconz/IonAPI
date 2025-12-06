@@ -48,6 +48,85 @@ ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
 
 ---
 
+## 📊 IonAPI vs Others
+
+<table>
+<tr>
+<th>Feature</th>
+<th>IonAPI</th>
+<th>Bukkit API</th>
+<th>Other Libraries</th>
+</tr>
+<tr>
+<td><strong>Folia Support</strong></td>
+<td>✅ Native</td>
+<td>❌ No</td>
+<td>⚠️ Partial</td>
+</tr>
+<tr>
+<td><strong>Async ORM</strong></td>
+<td>✅ Built-in + Caching</td>
+<td>❌ No</td>
+<td>⚠️ Basic</td>
+</tr>
+<tr>
+<td><strong>Economy API</strong></td>
+<td>✅ Vault + Async</td>
+<td>❌ No</td>
+<td>⚠️ Vault only</td>
+</tr>
+<tr>
+<td><strong>Redis Support</strong></td>
+<td>✅ Pub/Sub + KV</td>
+<td>❌ No</td>
+<td>❌ Rare</td>
+</tr>
+<tr>
+<td><strong>Hot-Reload Config</strong></td>
+<td>✅ WatchService</td>
+<td>❌ Manual</td>
+<td>❌ Manual</td>
+</tr>
+<tr>
+<td><strong>Item Builder</strong></td>
+<td>✅ MiniMessage</td>
+<td>⚠️ Legacy colors</td>
+<td>✅ Varies</td>
+</tr>
+<tr>
+<td><strong>GUI System</strong></td>
+<td>✅ Fluent + Pagination</td>
+<td>❌ Manual</td>
+<td>✅ Varies</td>
+</tr>
+<tr>
+<td><strong>Task Chains</strong></td>
+<td>✅ Async/Sync</td>
+<td>⚠️ Basic</td>
+<td>⚠️ Limited</td>
+</tr>
+<tr>
+<td><strong>Testing Framework</strong></td>
+<td>✅ Mocks included</td>
+<td>❌ No</td>
+<td>❌ Rare</td>
+</tr>
+<tr>
+<td><strong>Learning Curve</strong></td>
+<td>🟢 Low</td>
+<td>🟡 Medium</td>
+<td>🟡 Varies</td>
+</tr>
+<tr>
+<td><strong>Code Reduction</strong></td>
+<td>🟢 50-80%</td>
+<td>-</td>
+<td>🟡 30-50%</td>
+</tr>
+</table>
+
+---
+
 ## 🎯 Features
 
 <table>
@@ -77,6 +156,8 @@ ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
 
 ### 🌟 Additional Modules
 - 💰 **Economy System** - Vault-compatible with async API
+- 🔴 **Redis Integration** - Pub/sub messaging + KV storage
+- 🔥 **Hot-Reload Config** - Auto-reload on file changes
 - 🔌 **Cross-Server Messaging** - Velocity/BungeeCord support
 - 👻 **Packet NPCs** - Lightweight, zero-tick NPCs
 - 🏷️ **PlaceholderAPI Bridge** - Auto-registration
@@ -424,6 +505,42 @@ IonEconomy.transaction(player.getUniqueId())
 IonEconomy.transfer(sender, receiver, BigDecimal.valueOf(50));
 ```
 
+### 🔴 Redis Pub/Sub
+
+```java
+IonRedis redis = IonRedisBuilder.create()
+    .host("localhost")
+    .port(6379)
+    .password("secret")
+    .build();
+
+// Subscribe to channel
+redis.subscribe("player-events", message -> {
+    String data = message.getData();
+    Bukkit.broadcastMessage("Event: " + data);
+});
+
+// Publish message
+redis.publish("player-events", "Player joined: " + player.getName());
+
+// Key-value storage with TTL
+redis.set("player:" + uuid, playerData, 3600); // Expires in 1 hour
+```
+
+### 🔥 Hot-Reload Config
+
+```java
+HotReloadConfig config = HotReloadConfig.create(this, "config.yml")
+    .onReload(cfg -> {
+        welcomeMessage = cfg.getString("welcome-message");
+        maxPlayers = cfg.getInt("max-players");
+        getLogger().info("Config reloaded!");
+    })
+    .start();
+
+// Edit config.yml while server is running - changes apply instantly!
+```
+
 ---
 
 ## 🎯 Platform Compatibility
@@ -487,6 +604,7 @@ IonAPI/
 ├── 🔗 ion-tasks/        Task Chains
 ├── 💾 ion-database/     Database ORM + Caching
 ├── 💰 ion-economy/      Economy API + Vault hook
+├── 🔴 ion-redis/        Redis pub/sub + KV store
 ├── 🔌 ion-proxy/        Cross-server messaging
 ├── 👻 ion-npc/          Packet NPCs
 ├── 🏷️ ion-placeholder/  PlaceholderAPI bridge

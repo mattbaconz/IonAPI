@@ -33,6 +33,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `EntityCache` - Thread-safe cache with automatic expiration
   - `CacheManager` - Centralized cache management
 - New `AdvancedDatabaseExample.java` showing relationships, caching, and transactions
+- **ion-redis**: Redis integration module
+  - `IonRedis` - Async Redis client interface
+  - `IonRedisBuilder` - Fluent builder for Redis connections
+  - Pub/sub messaging support
+  - Key-value storage with TTL
+  - Connection statistics and health monitoring
+- **Hot-Reload Config**: Auto-reload configuration on file changes
+  - `HotReloadConfig` - WatchService-based config monitoring
+  - Multiple reload handlers support
+  - Real-time config updates without server restart
+- **Economy Admin Commands**: Debug commands for economy system
+  - `/ion eco set <player> <amount>` - Set player balance
+  - `/ion eco give <player> <amount>` - Give money to player
+  - `/ion eco debug <player>` - View raw database state
+- New `HotReloadExample.java` demonstrating config hot-reloading
+- JitPack configuration for Maven Central publication
+- "IonAPI vs Others" comparison table in README
 
 ---
 
