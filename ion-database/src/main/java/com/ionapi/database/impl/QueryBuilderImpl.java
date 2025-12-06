@@ -10,12 +10,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 /**
  * Implementation of QueryBuilder for type-safe queries.
  */
 public class QueryBuilderImpl<T> implements QueryBuilder<T> {
+
+    // Allowed SQL operators to prevent injection
+    private static final Set<String> ALLOWED_OPERATORS = Set.of(
+        "=", "!=", "<>", ">", "<", ">=", "<=", "LIKE", "NOT LIKE", "IN", "NOT IN", "IS", "IS NOT"
+    );
+    
+    // Allowed ORDER BY directions
+    private static final Set<String> ALLOWED_DIRECTIONS = Set.of("ASC", "DESC");
+    
+    // Pattern for valid SQL identifiers (table/column names)
+    private static final Pattern VALID_IDENTIFIER = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
     private final IonDatabaseImpl database;
     private final Class<T> entityClass;
@@ -29,12 +42,70 @@ public class QueryBuilderImpl<T> implements QueryBuilder<T> {
     public QueryBuilderImpl(IonDatabaseImpl database, Class<T> entityClass) {
         this.database = database;
         this.entityClass = entityClass;
-        this.tableName = database.getTableName(entityClass);
+        this.tableName = sanitizeIdentifier(database.getTableName(entityClass));
+    }
+    
+    /**
+     * Sanitizes a SQL identifier (table/column name) to prevent SQL injection.
+     * Only allows alphanumeric characters and underscores, starting with a letter or underscore.
+     *
+     * @param identifier the identifier to sanitize
+     * @return the sanitized identifier
+     * @throws IllegalArgumentException if the identifier is invalid
+     */
+    private static String sanitizeIdentifier(@NotNull String identifier) {
+        if (identifier == null || identifier.isEmpty()) {
+            throw new IllegalArgumentException("SQL identifier cannot be null or empty");
+        }
+        
+        // Remove any backticks or quotes that might be used for escaping
+        String cleaned = identifier.replace("`", "").replace("\"", "").replace("'", "").trim();
+        
+        if (!VALID_IDENTIFIER.matcher(cleaned).matches()) {
+            throw new IllegalArgumentException("Invalid SQL identifier: " + identifier + 
+                ". Only alphanumeric characters and underscores are allowed, starting with a letter or underscore.");
+        }
+        
+        return cleaned;
+    }
+    
+    /**
+     * Sanitizes a SQL operator to prevent SQL injection.
+     *
+     * @param operator the operator to sanitize
+     * @return the sanitized operator
+     * @throws IllegalArgumentException if the operator is not allowed
+     */
+    private static String sanitizeOperator(@NotNull String operator) {
+        String upper = operator.toUpperCase().trim();
+        if (!ALLOWED_OPERATORS.contains(upper)) {
+            throw new IllegalArgumentException("Invalid SQL operator: " + operator + 
+                ". Allowed operators: " + ALLOWED_OPERATORS);
+        }
+        return upper;
+    }
+    
+    /**
+     * Sanitizes an ORDER BY direction to prevent SQL injection.
+     *
+     * @param direction the direction to sanitize
+     * @return the sanitized direction
+     * @throws IllegalArgumentException if the direction is not allowed
+     */
+    private static String sanitizeDirection(@NotNull String direction) {
+        String upper = direction.toUpperCase().trim();
+        if (!ALLOWED_DIRECTIONS.contains(upper)) {
+            throw new IllegalArgumentException("Invalid ORDER BY direction: " + direction + 
+                ". Allowed directions: ASC, DESC");
+        }
+        return upper;
     }
 
     @Override
     public @NotNull QueryBuilder<T> where(@NotNull String column, @NotNull String operator, @NotNull Object value) {
-        conditions.add(column + " " + operator + " ?");
+        String safeColumn = sanitizeIdentifier(column);
+        String safeOperator = sanitizeOperator(operator);
+        conditions.add(safeColumn + " " + safeOperator + " ?");
         parameters.add(value);
         return this;
     }
@@ -49,7 +120,9 @@ public class QueryBuilderImpl<T> implements QueryBuilder<T> {
         if (conditions.isEmpty()) {
             return where(column, operator, value);
         }
-        conditions.add("AND " + column + " " + operator + " ?");
+        String safeColumn = sanitizeIdentifier(column);
+        String safeOperator = sanitizeOperator(operator);
+        conditions.add("AND " + safeColumn + " " + safeOperator + " ?");
         parameters.add(value);
         return this;
     }
@@ -64,7 +137,9 @@ public class QueryBuilderImpl<T> implements QueryBuilder<T> {
         if (conditions.isEmpty()) {
             return where(column, operator, value);
         }
-        conditions.add("OR " + column + " " + operator + " ?");
+        String safeColumn = sanitizeIdentifier(column);
+        String safeOperator = sanitizeOperator(operator);
+        conditions.add("OR " + safeColumn + " " + safeOperator + " ?");
         parameters.add(value);
         return this;
     }
@@ -81,7 +156,9 @@ public class QueryBuilderImpl<T> implements QueryBuilder<T> {
 
     @Override
     public @NotNull QueryBuilder<T> orderBy(@NotNull String column, @NotNull String direction) {
-        this.orderByClause = " ORDER BY " + column + " " + direction;
+        String safeColumn = sanitizeIdentifier(column);
+        String safeDirection = sanitizeDirection(direction);
+        this.orderByClause = " ORDER BY " + safeColumn + " " + safeDirection;
         return this;
     }
 

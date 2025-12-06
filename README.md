@@ -76,6 +76,7 @@ ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
 </table>
 
 ### 🌟 Additional Modules
+- 💰 **Economy System** - Vault-compatible with async API
 - 🔌 **Cross-Server Messaging** - Velocity/BungeeCord support
 - 👻 **Packet NPCs** - Lightweight, zero-tick NPCs
 - 🏷️ **PlaceholderAPI Bridge** - Auto-registration
@@ -379,10 +380,15 @@ TaskChain.create(plugin)
 
 ```java
 @Table("players")
+@Cacheable(ttl = 60) // Cache for 60 seconds
 public class PlayerData {
     @PrimaryKey private UUID uuid;
     @Column private String name;
     @Column private int level;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "guild_id")
+    private Guild guild;
 }
 
 // Simple queries
@@ -393,6 +399,29 @@ db.save(data);
 // Async support
 db.findAsync(PlayerData.class, uuid)
     .thenAccept(data -> processData(data));
+```
+
+### 💰 Economy System
+
+```java
+// Check balance
+IonEconomy.getBalance(player.getUniqueId()).thenAccept(balance -> {
+    player.sendMessage("Balance: " + IonEconomy.format(balance));
+});
+
+// Fluent transaction API
+IonEconomy.transaction(player.getUniqueId())
+    .withdraw(100)
+    .reason("Shop purchase")
+    .commit()
+    .thenAccept(result -> {
+        if (result.isSuccess()) {
+            player.sendMessage("<green>Purchase complete!");
+        }
+    });
+
+// Transfer between players
+IonEconomy.transfer(sender, receiver, BigDecimal.valueOf(50));
 ```
 
 ---
@@ -456,7 +485,8 @@ IonAPI/
 ├── 📦 ion-gui/          GUI System
 ├── 📊 ion-ui/           Scoreboard & BossBar
 ├── 🔗 ion-tasks/        Task Chains
-├── 💾 ion-database/     Database ORM
+├── 💾 ion-database/     Database ORM + Caching
+├── 💰 ion-economy/      Economy API + Vault hook
 ├── 🔌 ion-proxy/        Cross-server messaging
 ├── 👻 ion-npc/          Packet NPCs
 ├── 🏷️ ion-placeholder/  PlaceholderAPI bridge

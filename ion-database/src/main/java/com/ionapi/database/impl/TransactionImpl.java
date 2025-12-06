@@ -24,10 +24,20 @@ public class TransactionImpl implements Transaction {
 
     public TransactionImpl(IonDatabaseImpl database) throws DatabaseException {
         this.database = database;
+        Connection conn = null;
         try {
-            this.connection = database.getConnection();
-            this.connection.setAutoCommit(false);
+            conn = database.getConnection();
+            conn.setAutoCommit(false);
+            this.connection = conn;
         } catch (SQLException e) {
+            // Ensure connection is closed if setAutoCommit fails
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    e.addSuppressed(closeEx);
+                }
+            }
             throw new DatabaseException("Failed to begin transaction", e);
         }
     }
