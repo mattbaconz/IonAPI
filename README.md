@@ -224,7 +224,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.mattbaconz:IonAPI:1.0.0'
+    implementation 'com.github.mattbaconz:IonAPI:1.2.0'
 }
 
 shadowJar {
@@ -246,7 +246,7 @@ shadowJar {
     <dependency>
         <groupId>com.github.mattbaconz</groupId>
         <artifactId>IonAPI</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </dependency>
 </dependencies>
 
@@ -275,7 +275,7 @@ shadowJar {
 </build>
 ```
 
-> 💡 **Pro Tip**: Always relocate IonAPI to avoid conflicts when multiple plugins use different versions!
+> 💡 **Pro Tip**: Always relocate IonAPI to avoid conflicts when multiple plugins use different versions! For detailed instructions, module sizes, and dependency graphs, see the [Shading Guide](docs/SHADING.md).
 
 ### 🎯 Shading Made Easy
 
@@ -284,7 +284,7 @@ IonAPI is **designed for easy adoption** with minimal configuration:
 **✅ What you get:**
 - 📦 **Single JAR** - Everything bundled together
 - 🔒 **Conflict-free** - Proper relocation prevents issues
-- 🪶 **Lightweight** - Only ~500KB when shaded
+- 🪶 **Lightweight** - Only ~300KB when shaded
 - ⚡ **Fast** - No runtime dependencies to load
 - 🎯 **Simple** - Just add Shadow plugin and dependency
 
@@ -306,7 +306,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.0.0")
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
 }
 
 tasks {
