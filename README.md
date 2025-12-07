@@ -390,14 +390,37 @@ public class HelloCommand implements IonCommand {
 }
 ```
 
-### 3️⃣ Build & Run
+### 3️⃣ Configure Shading (build.gradle.kts)
+
+```kotlin
+plugins {
+    java
+    id("com.gradleup.shadow") version "8.3.0"
+}
+
+dependencies {
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    // ⚠️ CRITICAL: Always relocate to avoid conflicts
+    relocate("com.ionapi", "com.yourname.yourplugin.libs.ionapi")
+    minimize()
+}
+```
+
+### 4️⃣ Build & Run
 
 ```bash
 ./gradlew shadowJar
-# Copy build/libs/YourPlugin-1.0.0-all.jar to server/plugins/
+# Copy build/libs/YourPlugin-1.0.0.jar to server/plugins/
 ```
 
 **That's it!** 🎉
+
+> 💡 **Why relocate?** Prevents conflicts when multiple plugins use IonAPI. See [SHADING_GUIDE.md](SHADING_GUIDE.md) for details.
 
 ---
 

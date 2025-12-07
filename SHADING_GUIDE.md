@@ -448,4 +448,123 @@ jar tf build/libs/YourPlugin-1.0.0.jar | grep ionapi
 
 ---
 
+## 🎯 Advanced Relocation Examples
+
+### Multiple Plugins on Same Server
+If you have multiple plugins using IonAPI, each MUST relocate to avoid conflicts:
+
+**Plugin A:**
+```kotlin
+relocate("com.ionapi", "com.plugina.libs.ionapi")
+```
+
+**Plugin B:**
+```kotlin
+relocate("com.ionapi", "com.pluginb.libs.ionapi")
+```
+
+### Relocating Dependencies
+If you're using optional features that require dependencies:
+
+```kotlin
+tasks.shadowJar {
+    // Relocate IonAPI
+    relocate("com.ionapi", "${project.group}.libs.ionapi")
+    
+    // If using Redis (optional)
+    relocate("io.lettuce", "${project.group}.libs.lettuce")
+    
+    // If using custom database driver
+    relocate("org.xerial", "${project.group}.libs.sqlite")
+    
+    minimize()
+}
+```
+
+### Excluding Specific Classes
+Sometimes you want to exclude certain classes from relocation:
+
+```kotlin
+tasks.shadowJar {
+    relocate("com.ionapi", "${project.group}.libs.ionapi") {
+        // Don't relocate API interfaces (if you want them accessible)
+        exclude("com.ionapi.api.IonPlugin")
+    }
+}
+```
+
+---
+
+## 🧪 Testing Relocation
+
+### 1. Build Your Plugin
+```bash
+./gradlew clean shadowJar
+```
+
+### 2. Check JAR Contents
+```bash
+# Windows PowerShell
+jar tf build/libs/YourPlugin-1.0.0.jar | Select-String "ionapi"
+
+# Linux/Mac
+jar tf build/libs/YourPlugin-1.0.0.jar | grep ionapi
+```
+
+### 3. Expected Output
+```
+com/yourname/libs/ionapi/api/IonPlugin.class
+com/yourname/libs/ionapi/database/IonDatabase.class
+com/yourname/libs/ionapi/gui/IonGui.class
+...
+```
+
+### 4. Wrong Output (Not Relocated)
+```
+com/ionapi/api/IonPlugin.class  ❌ BAD - Will conflict!
+```
+
+---
+
+## ⚠️ Common Relocation Mistakes
+
+### Mistake 1: Forgetting to Relocate
+```kotlin
+// ❌ BAD - No relocation
+tasks.shadowJar {
+    archiveClassifier.set("")
+}
+```
+
+**Result**: Conflicts with other plugins using IonAPI
+
+### Mistake 2: Generic Relocation
+```kotlin
+// ❌ BAD - Too generic
+relocate("com.ionapi", "libs.ionapi")
+```
+
+**Result**: Still conflicts if another plugin uses `libs.ionapi`
+
+### Mistake 3: Not Using Shadow Plugin
+```kotlin
+// ❌ BAD - Regular JAR task
+tasks.jar {
+    from(configurations.runtimeClasspath.get().map { zipTree(it) })
+}
+```
+
+**Result**: No relocation, classes conflict
+
+### Correct Way
+```kotlin
+// ✅ GOOD
+tasks.shadowJar {
+    relocate("com.ionapi", "com.yourname.yourplugin.libs.ionapi")
+    minimize()
+}
+```
+
+---
+
 **Need help?** Join our Discord: https://discord.com/invite/VQjTVKjs46
