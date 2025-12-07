@@ -366,4 +366,15 @@ public interface IonDatabase {
      * @return true if logging is enabled
      */
     boolean isQueryLoggingEnabled();
+
+    /**
+     * Creates a batch operation for efficient bulk operations.
+     *
+     * @param entityClass the entity class
+     * @param <T> the entity type
+     * @return a batch operation builder
+     * @since 1.2.0
+     */
+    @NotNull
+    <T> BatchOperation<T> batch(@NotNull Class<T> entityClass);
 }

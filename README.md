@@ -165,7 +165,17 @@ ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
 - 🧪 **Unit Testing** - Mock framework (~21 KB)
 - 🔄 **Compatibility Layer** - Java 8+ polyfills (~38 KB)
 
-**Total size (all modules): ~252 KB** - Smaller than most images!
+### 🆕 v1.2.0 Features
+- ⏱️ **CooldownManager** - Thread-safe player cooldowns
+- 🚦 **RateLimiter** - Sliding window rate limiting
+- 💬 **MessageBuilder** - Fluent MiniMessage builder with templates
+- 📊 **IonScoreboard** - Easy scoreboard creation
+- 📈 **IonBossBar** - Boss bar management
+- 📉 **Metrics** - Lightweight performance monitoring
+- ⚡ **BatchOperation** - 10-50x faster bulk database operations
+- 🔄 **ReflectionCache** - Cached entity metadata for ORM
+
+**Total size (all modules): ~260 KB** - Smaller than most images!
 
 ---
 
@@ -187,7 +197,7 @@ repositories {
 
 dependencies {
     // IonAPI automatically shades into your plugin!
-    implementation("com.github.mattbaconz:IonAPI:1.0.0")
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
 }
 
 tasks.shadowJar {

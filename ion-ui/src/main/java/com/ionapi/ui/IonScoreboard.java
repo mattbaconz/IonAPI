@@ -1,273 +1,291 @@
 package com.ionapi.ui;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * Fluent API for creating and managing player scoreboards.
- * <p>
- * Example usage:
+ * Fluent API for creating and managing scoreboards.
+ * Supports MiniMessage formatting and dynamic updates.
+ *
+ * <p>Example usage:
  * <pre>{@code
- * IonScoreboard board = IonScoreboard.create(player)
- *     .title("<gold><bold>Server Stats")
- *     .line("Players: " + Bukkit.getOnlinePlayers().size())
- *     .line("TPS: 20.0")
- *     .line("")
- *     .line("<gray>example.com")
- *     .show();
+ * IonScoreboard board = IonScoreboard.builder()
+ *     .title("<gradient:gold:yellow><bold>My Server")
+ *     .line(15, "<gray>Welcome, <white>{player}")
+ *     .line(14, "")
+ *     .line(13, "<gold>Coins: <yellow>{coins}")
+ *     .line(12, "<green>Online: <white>{online}")
+ *     .placeholder("player", p -> p.getName())
+ *     .placeholder("coins", p -> String.valueOf(getCoins(p)))
+ *     .placeholder("online", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+ *     .build();
  *
- * // Update a specific line
- * board.updateLine(1, "Players: " + newCount);
- *
- * // Or update all lines
- * board.update();
+ * board.show(player);
+ * board.update(player); // Call periodically to refresh
  * }</pre>
+ *
+ * @since 1.2.0
  */
-public interface IonScoreboard {
+public class IonScoreboard {
 
-    /**
-     * Creates a new scoreboard for the specified player.
-     *
-     * @param player the player to create the scoreboard for
-     * @return a new scoreboard builder
-     */
-    @NotNull
-    static IonScoreboardBuilder create(@NotNull Player player) {
-        return new IonScoreboardBuilder(player);
+    private static final Map<UUID, IonScoreboard> ACTIVE_BOARDS = new ConcurrentHashMap<>();
+    private static final MiniMessage MINI = MiniMessage.miniMessage();
+
+    private final String title;
+    private final Map<Integer, String> lines;
+    private final Map<String, Function<Player, String>> placeholders;
+    private final Map<UUID, Scoreboard> playerBoards = new ConcurrentHashMap<>();
+
+    private IonScoreboard(Builder builder) {
+        this.title = builder.title;
+        this.lines = new LinkedHashMap<>(builder.lines);
+        this.placeholders = new HashMap<>(builder.placeholders);
     }
 
     /**
-     * Gets the player this scoreboard belongs to.
+     * Creates a new scoreboard builder.
      *
-     * @return the player
+     * @return a new builder
      */
     @NotNull
-    Player getPlayer();
+    public static Builder builder() {
+        return new Builder();
+    }
 
     /**
-     * Sets the title of the scoreboard.
+     * Gets the active scoreboard for a player.
      *
-     * @param title the title (supports MiniMessage)
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard title(@NotNull String title);
-
-    /**
-     * Sets the title of the scoreboard.
-     *
-     * @param title the title component
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard title(@NotNull Component title);
-
-    /**
-     * Gets the current title of the scoreboard.
-     *
-     * @return the title
-     */
-    @NotNull
-    Component getTitle();
-
-    /**
-     * Adds a line to the scoreboard.
-     *
-     * @param text the line text (supports MiniMessage)
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard line(@NotNull String text);
-
-    /**
-     * Adds a line to the scoreboard.
-     *
-     * @param component the line component
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard line(@NotNull Component component);
-
-    /**
-     * Sets all lines at once.
-     *
-     * @param lines the lines (supports MiniMessage)
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard lines(@NotNull String... lines);
-
-    /**
-     * Sets all lines at once.
-     *
-     * @param lines the lines (supports MiniMessage)
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard lines(@NotNull List<String> lines);
-
-    /**
-     * Sets all lines at once using components.
-     *
-     * @param lines the line components
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard linesComponents(@NotNull List<Component> lines);
-
-    /**
-     * Updates a specific line.
-     *
-     * @param index the line index (0-based, from top)
-     * @param text the new text (supports MiniMessage)
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard updateLine(int index, @NotNull String text);
-
-    /**
-     * Updates a specific line.
-     *
-     * @param index the line index (0-based, from top)
-     * @param component the new component
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard updateLine(int index, @NotNull Component component);
-
-    /**
-     * Removes a specific line.
-     *
-     * @param index the line index (0-based, from top)
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard removeLine(int index);
-
-    /**
-     * Inserts a line at the specified index.
-     *
-     * @param index the index to insert at
-     * @param text the line text (supports MiniMessage)
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard insertLine(int index, @NotNull String text);
-
-    /**
-     * Clears all lines from the scoreboard.
-     *
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard clearLines();
-
-    /**
-     * Gets the current lines.
-     *
-     * @return the list of line components
-     */
-    @NotNull
-    List<Component> getLines();
-
-    /**
-     * Gets the number of lines.
-     *
-     * @return the line count
-     */
-    int getLineCount();
-
-    /**
-     * Sets a dynamic line supplier for a specific line.
-     * The supplier will be called every time the scoreboard updates.
-     *
-     * @param index the line index
-     * @param supplier the text supplier function
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard dynamicLine(int index, @NotNull Function<Player, String> supplier);
-
-    /**
-     * Sets a dynamic title supplier.
-     * The supplier will be called every time the scoreboard updates.
-     *
-     * @param supplier the title supplier function
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard dynamicTitle(@NotNull Function<Player, String> supplier);
-
-    /**
-     * Enables automatic updating of the scoreboard.
-     *
-     * @param intervalTicks the update interval in ticks
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard autoUpdate(long intervalTicks);
-
-    /**
-     * Disables automatic updating.
-     *
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard stopAutoUpdate();
-
-    /**
-     * Checks if auto-update is enabled.
-     *
-     * @return true if auto-updating
-     */
-    boolean isAutoUpdating();
-
-    /**
-     * Manually updates all dynamic content.
-     *
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard update();
-
-    /**
-     * Shows the scoreboard to the player.
-     *
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard show();
-
-    /**
-     * Hides the scoreboard from the player.
-     *
-     * @return this scoreboard
-     */
-    @NotNull
-    IonScoreboard hide();
-
-    /**
-     * Checks if the scoreboard is currently visible.
-     *
-     * @return true if visible
-     */
-    boolean isVisible();
-
-    /**
-     * Destroys this scoreboard and cleans up resources.
-     */
-    void destroy();
-
-    /**
-     * Gets the underlying Bukkit scoreboard.
-     *
-     * @return the bukkit scoreboard, or null if not shown
+     * @param player the player
+     * @return the active scoreboard, or null
      */
     @Nullable
-    org.bukkit.scoreboard.Scoreboard getBukkitScoreboard();
+    public static IonScoreboard getActive(@NotNull Player player) {
+        return ACTIVE_BOARDS.get(player.getUniqueId());
+    }
+
+    /**
+     * Shows this scoreboard to a player.
+     *
+     * @param player the player
+     */
+    public void show(@NotNull Player player) {
+        // Remove any existing scoreboard
+        IonScoreboard existing = ACTIVE_BOARDS.get(player.getUniqueId());
+        if (existing != null && existing != this) {
+            existing.hide(player);
+        }
+
+        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+        Objective objective = board.registerNewObjective("ionboard", Criteria.DUMMY, parseText(title, player));
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        updateLines(player, board, objective);
+
+        player.setScoreboard(board);
+        playerBoards.put(player.getUniqueId(), board);
+        ACTIVE_BOARDS.put(player.getUniqueId(), this);
+    }
+
+    /**
+     * Hides this scoreboard from a player.
+     *
+     * @param player the player
+     */
+    public void hide(@NotNull Player player) {
+        playerBoards.remove(player.getUniqueId());
+        ACTIVE_BOARDS.remove(player.getUniqueId());
+        player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+    }
+
+    /**
+     * Updates the scoreboard for a player.
+     *
+     * @param player the player
+     */
+    public void update(@NotNull Player player) {
+        Scoreboard board = playerBoards.get(player.getUniqueId());
+        if (board == null) return;
+
+        Objective objective = board.getObjective("ionboard");
+        if (objective == null) return;
+
+        // Update title
+        objective.displayName(parseText(title, player));
+
+        // Clear and re-add lines
+        updateLines(player, board, objective);
+    }
+
+    /**
+     * Updates a specific line for a player.
+     *
+     * @param player the player
+     * @param score the line score
+     * @param text the new text
+     */
+    public void setLine(@NotNull Player player, int score, @NotNull String text) {
+        lines.put(score, text);
+        update(player);
+    }
+
+    /**
+     * Checks if this scoreboard is shown to a player.
+     *
+     * @param player the player
+     * @return true if shown
+     */
+    public boolean isShown(@NotNull Player player) {
+        return playerBoards.containsKey(player.getUniqueId());
+    }
+
+    /**
+     * Gets all players viewing this scoreboard.
+     *
+     * @return set of player UUIDs
+     */
+    @NotNull
+    public Set<UUID> getViewers() {
+        return Collections.unmodifiableSet(playerBoards.keySet());
+    }
+
+    /**
+     * Destroys this scoreboard and removes it from all players.
+     */
+    public void destroy() {
+        for (UUID uuid : new HashSet<>(playerBoards.keySet())) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                hide(player);
+            }
+        }
+        playerBoards.clear();
+    }
+
+    private void updateLines(Player player, Scoreboard board, Objective objective) {
+        // Remove old entries
+        for (String entry : board.getEntries()) {
+            board.resetScores(entry);
+        }
+
+        // Add new lines
+        Set<String> usedEntries = new HashSet<>();
+        for (Map.Entry<Integer, String> entry : lines.entrySet()) {
+            String text = parsePlaceholders(entry.getValue(), player);
+            Component component = parseText(text, player);
+
+            // Create unique entry for each line
+            String entryName = createUniqueEntry(text, usedEntries);
+            usedEntries.add(entryName);
+
+            Team team = board.getTeam("line" + entry.getKey());
+            if (team == null) {
+                team = board.registerNewTeam("line" + entry.getKey());
+            }
+            team.addEntry(entryName);
+            team.prefix(component);
+
+            objective.getScore(entryName).setScore(entry.getKey());
+        }
+    }
+
+    private String createUniqueEntry(String text, Set<String> used) {
+        // Use color codes to create unique invisible entries
+        String base = "§" + Integer.toHexString(used.size() % 16);
+        while (used.contains(base)) {
+            base += "§r";
+        }
+        return base;
+    }
+
+    private String parsePlaceholders(String text, Player player) {
+        for (Map.Entry<String, Function<Player, String>> entry : placeholders.entrySet()) {
+            text = text.replace("{" + entry.getKey() + "}", entry.getValue().apply(player));
+        }
+        return text;
+    }
+
+    private Component parseText(String text, Player player) {
+        return MINI.deserialize(parsePlaceholders(text, player));
+    }
+
+    /**
+     * Builder for IonScoreboard.
+     */
+    public static class Builder {
+        private String title = "<white>Scoreboard";
+        private final Map<Integer, String> lines = new LinkedHashMap<>();
+        private final Map<String, Function<Player, String>> placeholders = new HashMap<>();
+
+        /**
+         * Sets the scoreboard title.
+         *
+         * @param title the title (supports MiniMessage)
+         * @return this builder
+         */
+        @NotNull
+        public Builder title(@NotNull String title) {
+            this.title = title;
+            return this;
+        }
+
+        /**
+         * Adds a line at the specified score.
+         *
+         * @param score the score (higher = higher on board)
+         * @param text the line text (supports MiniMessage and placeholders)
+         * @return this builder
+         */
+        @NotNull
+        public Builder line(int score, @NotNull String text) {
+            lines.put(score, text);
+            return this;
+        }
+
+        /**
+         * Adds multiple lines starting from a score.
+         *
+         * @param startScore the starting score
+         * @param texts the line texts
+         * @return this builder
+         */
+        @NotNull
+        public Builder lines(int startScore, @NotNull String... texts) {
+            for (int i = 0; i < texts.length; i++) {
+                lines.put(startScore - i, texts[i]);
+            }
+            return this;
+        }
+
+        /**
+         * Registers a placeholder.
+         *
+         * @param key the placeholder key (without braces)
+         * @param resolver the function to resolve the value
+         * @return this builder
+         */
+        @NotNull
+        public Builder placeholder(@NotNull String key, @NotNull Function<Player, String> resolver) {
+            placeholders.put(key, resolver);
+            return this;
+        }
+
+        /**
+         * Builds the scoreboard.
+         *
+         * @return the built scoreboard
+         */
+        @NotNull
+        public IonScoreboard build() {
+            return new IonScoreboard(this);
+        }
+    }
 }

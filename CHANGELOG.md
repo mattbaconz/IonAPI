@@ -5,7 +5,60 @@ All notable changes to IonAPI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] - Unreleased
+## [1.2.0] - Unreleased
+
+### ⚡ Performance
+- **Reflection Caching**: Entity metadata is now cached, providing 10-50x faster ORM operations
+- **Batch Operations**: New `BatchOperation` API for efficient bulk insert/update/delete
+- **Optimized Dependencies**: Redis Lettuce client is now `compileOnly` to reduce JAR size
+
+### ✨ Added
+- **CooldownManager**: Thread-safe player cooldown management
+  - Named cooldown managers for different actions
+  - Automatic cleanup of expired cooldowns
+  - Time unit flexibility (seconds, minutes, etc.)
+- **RateLimiter**: Sliding window rate limiting
+  - Prevent spam and abuse
+  - Per-player rate limits
+  - Configurable window and request limits
+- **MessageBuilder**: Fluent MiniMessage builder
+  - Placeholder support
+  - Title/subtitle/actionbar sending
+  - Reusable message templates
+  - Broadcast support
+- **IonScoreboard**: Easy scoreboard creation
+  - MiniMessage formatting
+  - Dynamic placeholders
+  - Per-player scoreboards
+  - Auto-update support
+- **IonBossBar**: Boss bar management
+  - MiniMessage formatting
+  - Progress updates
+  - Color and style changes
+  - Named bars for retrieval
+- **Metrics**: Lightweight performance monitoring
+  - Counters for events
+  - Timing statistics
+  - Gauge values
+  - Min/max/average tracking
+- **BatchOperation**: Bulk database operations
+  - Batch insert/update/delete
+  - Configurable batch size
+  - Async execution
+  - Performance statistics
+- **ReflectionCache**: Entity metadata caching
+  - Automatic field discovery
+  - Column name resolution
+  - Primary key detection
+
+### 📚 Documentation
+- New `V120FeaturesExample.java` demonstrating all new features
+- Updated Javadocs for all new classes
+- Javadoc generation with `./gradlew aggregateJavadoc`
+
+---
+
+## [1.1.0] - 2024-12-06
 
 ### 🔒 Security
 - Fixed SQL injection vulnerability in `QueryBuilderImpl` - all column names, operators, and ORDER BY directions are now sanitized

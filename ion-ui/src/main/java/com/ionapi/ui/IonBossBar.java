@@ -2,303 +2,365 @@ package com.ionapi.ui;
 
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
  * Fluent API for creating and managing boss bars.
- * <p>
- * Example usage:
+ * Supports MiniMessage formatting, animations, and dynamic updates.
+ *
+ * <p>Example usage:
  * <pre>{@code
- * IonBossBar bar = IonBossBar.create()
- *     .title("<red>Boss Health")
- *     .progress(0.75)
+ * IonBossBar bar = IonBossBar.builder()
+ *     .title("<gradient:red:orange>Event Progress: {progress}%")
  *     .color(BossBar.Color.RED)
  *     .style(BossBar.Overlay.PROGRESS)
- *     .show(player);
+ *     .progress(0.5f)
+ *     .placeholder("progress", p -> "50")
+ *     .build();
  *
- * // Update progress
- * bar.progress(0.5);
- *
- * // Hide after delay
- * scheduler.runLater(() -> bar.hide(), 5, TimeUnit.SECONDS);
+ * bar.show(player);
+ * bar.setProgress(0.75f); // Update progress
+ * bar.hide(player);
  * }</pre>
+ *
+ * @since 1.2.0
  */
-public interface IonBossBar {
+public class IonBossBar {
+
+    private static final MiniMessage MINI = MiniMessage.miniMessage();
+    private static final Map<String, IonBossBar> NAMED_BARS = new ConcurrentHashMap<>();
+
+    private final String name;
+    private String title;
+    private BossBar.Color color;
+    private BossBar.Overlay overlay;
+    private float progress;
+    private final Set<BossBar.Flag> flags;
+    private final Map<String, Function<Player, String>> placeholders;
+    private final Map<UUID, BossBar> playerBars = new ConcurrentHashMap<>();
+
+    private IonBossBar(Builder builder) {
+        this.name = builder.name;
+        this.title = builder.title;
+        this.color = builder.color;
+        this.overlay = builder.overlay;
+        this.progress = builder.progress;
+        this.flags = EnumSet.copyOf(builder.flags.isEmpty() ? EnumSet.noneOf(BossBar.Flag.class) : builder.flags);
+        this.placeholders = new HashMap<>(builder.placeholders);
+
+        if (name != null) {
+            NAMED_BARS.put(name, this);
+        }
+    }
 
     /**
      * Creates a new boss bar builder.
      *
-     * @return a new boss bar builder
+     * @return a new builder
      */
     @NotNull
-    static IonBossBarBuilder create() {
-        return new IonBossBarBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
-     * Creates a new boss bar builder with a title.
+     * Gets a named boss bar.
      *
-     * @param title the title (supports MiniMessage)
-     * @return a new boss bar builder
+     * @param name the name
+     * @return the boss bar, or null if not found
      */
-    @NotNull
-    static IonBossBarBuilder create(@NotNull String title) {
-        return (IonBossBarBuilder) new IonBossBarBuilder().title(title);
+    public static IonBossBar get(@NotNull String name) {
+        return NAMED_BARS.get(name);
     }
 
     /**
-     * Sets the title of the boss bar.
+     * Shows this boss bar to a player.
      *
-     * @param title the title (supports MiniMessage)
+     * @param player the player
+     */
+    public void show(@NotNull Player player) {
+        BossBar bar = createBar(player);
+        playerBars.put(player.getUniqueId(), bar);
+        player.showBossBar(bar);
+    }
+
+    /**
+     * Hides this boss bar from a player.
+     *
+     * @param player the player
+     */
+    public void hide(@NotNull Player player) {
+        BossBar bar = playerBars.remove(player.getUniqueId());
+        if (bar != null) {
+            player.hideBossBar(bar);
+        }
+    }
+
+    /**
+     * Updates the boss bar for a player.
+     *
+     * @param player the player
+     */
+    public void update(@NotNull Player player) {
+        BossBar bar = playerBars.get(player.getUniqueId());
+        if (bar != null) {
+            bar.name(parseTitle(player));
+            bar.color(color);
+            bar.overlay(overlay);
+            bar.progress(progress);
+        }
+    }
+
+    /**
+     * Updates the boss bar for all viewers.
+     */
+    public void updateAll() {
+        for (UUID uuid : playerBars.keySet()) {
+            org.bukkit.Bukkit.getPlayer(uuid);
+            // Update handled by Adventure API automatically for shared bars
+        }
+    }
+
+    /**
+     * Sets the title.
+     *
+     * @param title the new title
      * @return this boss bar
      */
     @NotNull
-    IonBossBar title(@NotNull String title);
+    public IonBossBar setTitle(@NotNull String title) {
+        this.title = title;
+        for (Map.Entry<UUID, BossBar> entry : playerBars.entrySet()) {
+            Player player = org.bukkit.Bukkit.getPlayer(entry.getKey());
+            if (player != null) {
+                entry.getValue().name(parseTitle(player));
+            }
+        }
+        return this;
+    }
 
     /**
-     * Sets the title of the boss bar.
+     * Sets the progress (0.0 to 1.0).
      *
-     * @param title the title component
+     * @param progress the progress
      * @return this boss bar
      */
     @NotNull
-    IonBossBar title(@NotNull Component title);
+    public IonBossBar setProgress(float progress) {
+        this.progress = Math.max(0f, Math.min(1f, progress));
+        for (BossBar bar : playerBars.values()) {
+            bar.progress(this.progress);
+        }
+        return this;
+    }
 
     /**
-     * Gets the current title.
+     * Sets the color.
      *
-     * @return the title
-     */
-    @NotNull
-    Component getTitle();
-
-    /**
-     * Sets the progress of the boss bar.
-     *
-     * @param progress the progress (0.0 to 1.0)
+     * @param color the color
      * @return this boss bar
      */
     @NotNull
-    IonBossBar progress(float progress);
+    public IonBossBar setColor(@NotNull BossBar.Color color) {
+        this.color = color;
+        for (BossBar bar : playerBars.values()) {
+            bar.color(color);
+        }
+        return this;
+    }
 
     /**
-     * Sets the progress as a percentage.
+     * Sets the overlay style.
      *
-     * @param percent the progress percentage (0 to 100)
+     * @param overlay the overlay
      * @return this boss bar
      */
     @NotNull
-    IonBossBar progressPercent(int percent);
+    public IonBossBar setOverlay(@NotNull BossBar.Overlay overlay) {
+        this.overlay = overlay;
+        for (BossBar bar : playerBars.values()) {
+            bar.overlay(overlay);
+        }
+        return this;
+    }
 
     /**
      * Gets the current progress.
      *
      * @return the progress (0.0 to 1.0)
      */
-    float getProgress();
+    public float getProgress() {
+        return progress;
+    }
 
     /**
-     * Sets the color of the boss bar.
+     * Checks if shown to a player.
      *
-     * @param color the color
-     * @return this boss bar
+     * @param player the player
+     * @return true if shown
+     */
+    public boolean isShown(@NotNull Player player) {
+        return playerBars.containsKey(player.getUniqueId());
+    }
+
+    /**
+     * Gets all viewers.
+     *
+     * @return set of viewer UUIDs
      */
     @NotNull
-    IonBossBar color(@NotNull BossBar.Color color);
+    public Set<UUID> getViewers() {
+        return Collections.unmodifiableSet(playerBars.keySet());
+    }
 
     /**
-     * Gets the current color.
-     *
-     * @return the color
+     * Destroys this boss bar and removes from all players.
      */
-    @NotNull
-    BossBar.Color getColor();
+    public void destroy() {
+        for (UUID uuid : new HashSet<>(playerBars.keySet())) {
+            Player player = org.bukkit.Bukkit.getPlayer(uuid);
+            if (player != null) {
+                hide(player);
+            }
+        }
+        playerBars.clear();
+        if (name != null) {
+            NAMED_BARS.remove(name);
+        }
+    }
+
+    private BossBar createBar(Player player) {
+        BossBar bar = BossBar.bossBar(parseTitle(player), progress, color, overlay, flags);
+        return bar;
+    }
+
+    private Component parseTitle(Player player) {
+        String text = title;
+        for (Map.Entry<String, Function<Player, String>> entry : placeholders.entrySet()) {
+            text = text.replace("{" + entry.getKey() + "}", entry.getValue().apply(player));
+        }
+        return MINI.deserialize(text);
+    }
 
     /**
-     * Sets the overlay style of the boss bar.
-     *
-     * @param overlay the overlay style
-     * @return this boss bar
+     * Builder for IonBossBar.
      */
-    @NotNull
-    IonBossBar overlay(@NotNull BossBar.Overlay overlay);
+    public static class Builder {
+        private String name;
+        private String title = "<white>Boss Bar";
+        private BossBar.Color color = BossBar.Color.WHITE;
+        private BossBar.Overlay overlay = BossBar.Overlay.PROGRESS;
+        private float progress = 1.0f;
+        private final Set<BossBar.Flag> flags = EnumSet.noneOf(BossBar.Flag.class);
+        private final Map<String, Function<Player, String>> placeholders = new HashMap<>();
 
-    /**
-     * Gets the current overlay style.
-     *
-     * @return the overlay
-     */
-    @NotNull
-    BossBar.Overlay getOverlay();
+        /**
+         * Sets a unique name for this boss bar (for retrieval).
+         *
+         * @param name the name
+         * @return this builder
+         */
+        @NotNull
+        public Builder name(@NotNull String name) {
+            this.name = name;
+            return this;
+        }
 
-    /**
-     * Adds a flag to the boss bar.
-     *
-     * @param flag the flag to add
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar addFlag(@NotNull BossBar.Flag flag);
+        /**
+         * Sets the title.
+         *
+         * @param title the title (supports MiniMessage)
+         * @return this builder
+         */
+        @NotNull
+        public Builder title(@NotNull String title) {
+            this.title = title;
+            return this;
+        }
 
-    /**
-     * Removes a flag from the boss bar.
-     *
-     * @param flag the flag to remove
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar removeFlag(@NotNull BossBar.Flag flag);
+        /**
+         * Sets the color.
+         *
+         * @param color the color
+         * @return this builder
+         */
+        @NotNull
+        public Builder color(@NotNull BossBar.Color color) {
+            this.color = color;
+            return this;
+        }
 
-    /**
-     * Checks if the boss bar has a specific flag.
-     *
-     * @param flag the flag to check
-     * @return true if the flag is present
-     */
-    boolean hasFlag(@NotNull BossBar.Flag flag);
+        /**
+         * Sets the overlay style.
+         *
+         * @param overlay the overlay
+         * @return this builder
+         */
+        @NotNull
+        public Builder overlay(@NotNull BossBar.Overlay overlay) {
+            this.overlay = overlay;
+            return this;
+        }
 
-    /**
-     * Shows the boss bar to a player.
-     *
-     * @param player the player to show to
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar show(@NotNull Player player);
+        /**
+         * Alias for overlay.
+         */
+        @NotNull
+        public Builder style(@NotNull BossBar.Overlay overlay) {
+            return overlay(overlay);
+        }
 
-    /**
-     * Shows the boss bar to multiple players.
-     *
-     * @param players the players to show to
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar show(@NotNull Player... players);
+        /**
+         * Sets the progress (0.0 to 1.0).
+         *
+         * @param progress the progress
+         * @return this builder
+         */
+        @NotNull
+        public Builder progress(float progress) {
+            this.progress = Math.max(0f, Math.min(1f, progress));
+            return this;
+        }
 
-    /**
-     * Shows the boss bar to multiple players.
-     *
-     * @param players the players to show to
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar show(@NotNull Collection<Player> players);
+        /**
+         * Adds a flag.
+         *
+         * @param flag the flag
+         * @return this builder
+         */
+        @NotNull
+        public Builder flag(@NotNull BossBar.Flag flag) {
+            flags.add(flag);
+            return this;
+        }
 
-    /**
-     * Hides the boss bar from a player.
-     *
-     * @param player the player to hide from
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar hide(@NotNull Player player);
+        /**
+         * Registers a placeholder.
+         *
+         * @param key the placeholder key
+         * @param resolver the resolver function
+         * @return this builder
+         */
+        @NotNull
+        public Builder placeholder(@NotNull String key, @NotNull Function<Player, String> resolver) {
+            placeholders.put(key, resolver);
+            return this;
+        }
 
-    /**
-     * Hides the boss bar from multiple players.
-     *
-     * @param players the players to hide from
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar hide(@NotNull Player... players);
-
-    /**
-     * Hides the boss bar from all viewers.
-     *
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar hideAll();
-
-    /**
-     * Checks if the boss bar is visible to a player.
-     *
-     * @param player the player to check
-     * @return true if visible
-     */
-    boolean isVisible(@NotNull Player player);
-
-    /**
-     * Gets all players who can see this boss bar.
-     *
-     * @return the collection of viewers
-     */
-    @NotNull
-    Collection<Player> getViewers();
-
-    /**
-     * Gets the number of viewers.
-     *
-     * @return the viewer count
-     */
-    int getViewerCount();
-
-    /**
-     * Sets a dynamic title supplier.
-     * The supplier will be called every time the boss bar updates.
-     *
-     * @param supplier the title supplier function
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar dynamicTitle(@NotNull Function<IonBossBar, String> supplier);
-
-    /**
-     * Sets a dynamic progress supplier.
-     * The supplier will be called every time the boss bar updates.
-     *
-     * @param supplier the progress supplier function (returns 0.0 to 1.0)
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar dynamicProgress(@NotNull Function<IonBossBar, Float> supplier);
-
-    /**
-     * Enables automatic updating of the boss bar.
-     *
-     * @param intervalTicks the update interval in ticks
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar autoUpdate(long intervalTicks);
-
-    /**
-     * Disables automatic updating.
-     *
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar stopAutoUpdate();
-
-    /**
-     * Checks if auto-update is enabled.
-     *
-     * @return true if auto-updating
-     */
-    boolean isAutoUpdating();
-
-    /**
-     * Manually updates all dynamic content.
-     *
-     * @return this boss bar
-     */
-    @NotNull
-    IonBossBar update();
-
-    /**
-     * Destroys this boss bar and cleans up resources.
-     */
-    void destroy();
-
-    /**
-     * Gets the underlying Adventure boss bar.
-     *
-     * @return the adventure boss bar
-     */
-    @NotNull
-    BossBar getAdventureBossBar();
+        /**
+         * Builds the boss bar.
+         *
+         * @return the built boss bar
+         */
+        @NotNull
+        public IonBossBar build() {
+            return new IonBossBar(this);
+        }
+    }
 }

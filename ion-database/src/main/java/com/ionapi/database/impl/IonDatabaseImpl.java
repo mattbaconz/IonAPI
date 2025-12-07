@@ -2,6 +2,7 @@ package com.ionapi.database.impl;
 
 import com.ionapi.database.*;
 import com.ionapi.database.annotations.Column;
+import com.ionapi.database.cache.ReflectionCache;
 import com.ionapi.database.annotations.PrimaryKey;
 import com.ionapi.database.annotations.Table;
 import com.zaxxer.hikari.HikariConfig;
@@ -522,6 +523,11 @@ public class IonDatabaseImpl implements IonDatabase {
     @Override
     public boolean isQueryLoggingEnabled() {
         return queryLogging;
+    }
+
+    @Override
+    public @NotNull <T> BatchOperation<T> batch(@NotNull Class<T> entityClass) {
+        return new BatchOperationImpl<>(this, entityClass);
     }
 
     // ==================== Helper Methods ====================
