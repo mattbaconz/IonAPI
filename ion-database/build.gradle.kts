@@ -10,8 +10,8 @@ dependencies {
     compileOnly("org.xerial:sqlite-jdbc:3.44.1.0")
     compileOnly("com.h2database:h2:2.2.224")
 
-    // HikariCP for connection pooling
-    implementation("com.zaxxer:HikariCP:5.1.0")
+    // HikariCP for connection pooling (Paper provides this)
+    compileOnly("com.zaxxer:HikariCP:5.1.0")
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
