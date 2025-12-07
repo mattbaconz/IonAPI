@@ -619,7 +619,6 @@ HotReloadConfig config = HotReloadConfig.create(this, "config.yml")
 ### 🔧 Advanced
 - [Migration Guide](docs/MIGRATION_GUIDE.md)
 - [Technical Analysis](docs/TECHNICAL_ANALYSIS.md)
-- [AI IDE Guide](IONAPI_AI_GUIDE.md)
 
 </td>
 </tr>
