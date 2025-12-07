@@ -81,6 +81,7 @@ tasks.withType<ShadowJar> {
     archiveClassifier.set("") // Produce IonAPI-1.2.0.jar
     // Merge service files (like plugin.yml if multiple, though unlikely here)
     mergeServiceFiles()
+    relocate("com.zaxxer.hikari", "com.ionapi.lib.hikari")
 }
 
 // Publish the root project's Shadow JAR
