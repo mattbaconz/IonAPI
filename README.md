@@ -609,16 +609,16 @@ HotReloadConfig config = HotReloadConfig.create(this, "config.yml")
 <td width="33%">
 
 ### 💡 Learn More
-- [Feature Guide](docs/NEW_FEATURES.md)
 - [Examples](docs/EXAMPLES.md)
 - [Folia Guide](docs/FOLIA_GUIDE.md)
+- [Javadoc Guide](docs/JAVADOC_GUIDE.md)
 
 </td>
 <td width="33%">
 
 ### 🔧 Advanced
 - [Migration Guide](docs/MIGRATION_GUIDE.md)
-- [Technical Analysis](docs/TECHNICAL_ANALYSIS.md)
+- [Shading Guide](docs/SHADING.md)
 
 </td>
 </tr>

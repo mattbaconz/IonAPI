@@ -824,9 +824,10 @@ public void updateBoard(Player player) {
 
 - **[API Reference](API_REFERENCE.md)** - Complete API documentation
 - **[Quick Reference](QUICK_REFERENCE.md)** - Quick cheatsheet
-- **[New Features Guide](NEW_FEATURES.md)** - Detailed feature documentation
 - **[Examples](EXAMPLES.md)** - Real-world code examples
 - **[Folia Guide](FOLIA_GUIDE.md)** - Folia compatibility guide
+- **[Javadoc Guide](JAVADOC_GUIDE.md)** - Generate and view Javadocs
+- **[Shading Guide](SHADING.md)** - Shading and relocation guide
 - **[Migration Guide](MIGRATION_GUIDE.md)** - Migrate from old code
 
 ### Join the Community
