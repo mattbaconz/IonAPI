@@ -5,7 +5,9 @@ All notable changes to IonAPI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - Unreleased
+---
+
+## [1.2.0] - 2024-12-07
 
 ### ⚡ Performance
 - **Reflection Caching**: Entity metadata is now cached, providing 10-50x faster ORM operations
@@ -132,5 +134,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/mattbaconz/IonAPI/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/mattbaconz/IonAPI/releases/tag/v1.0.0
+## 📊 Version Comparison
+
+| Version | Release Date | Key Features | Size |
+|---------|--------------|--------------|------|
+| 1.2.0 | 2024-12-07 | Performance optimizations, 8 new utilities | 273 KB |
+| 1.1.0 | 2024-12-06 | Economy, Redis, ORM relationships, Security fixes | 252 KB |
+| 1.0.0 | 2024-12-06 | Initial release with 13 modules | 230 KB |
+
+---
+
+## 🔗 Links
+
+- **Repository**: https://github.com/mattbaconz/IonAPI
+- **JitPack**: https://jitpack.io/#mattbaconz/IonAPI
+- **Discord**: https://discord.com/invite/VQjTVKjs46
+- **Documentation**: https://github.com/mattbaconz/IonAPI/tree/main/docs
+
+---
+
+[Unreleased]: https://github.com/mattbaconz/IonAPI/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/mattbaconz/IonAPI/compare/1.1.0...1.2.0
+[1.1.0]: https://github.com/mattbaconz/IonAPI/compare/1.0.0...1.1.0
+[1.0.0]: https://github.com/mattbaconz/IonAPI/releases/tag/1.0.0
