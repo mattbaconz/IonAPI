@@ -1,9 +1,15 @@
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
+    id("com.gradleup.shadow") version "8.3.0"
+    `maven-publish`
 }
 
 allprojects {
-    group = "com.ionapi"
+    group = "com.github.mattbaconz"
     version = "1.2.0"
 
     repositories {
@@ -13,9 +19,11 @@ allprojects {
     }
 }
 
+// Subprojects configuration
 subprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
 
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
@@ -36,11 +44,50 @@ subprojects {
             links("https://jd.papermc.io/paper/1.20/")
         }
     }
+
+    configure<PublishingExtension> {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+            }
+        }
+    }
 }
 
-// Note: All-in-one JAR is handled by JitPack automatically
-// Developers can use: implementation("com.github.mattbaconz:IonAPI:1.1.0")
-// JitPack will bundle all modules together
+// Root project dependencies (all modules) for the "All-in-one" JAR
+dependencies {
+    implementation(project(":ion-api"))
+    implementation(project(":ion-core"))
+    implementation(project(":ion-gui"))
+    implementation(project(":ion-item"))
+    implementation(project(":ion-ui"))
+    implementation(project(":ion-tasks"))
+    implementation(project(":ion-database"))
+    implementation(project(":ion-proxy"))
+    implementation(project(":ion-npc"))
+    implementation(project(":ion-placeholder"))
+    implementation(project(":ion-inject"))
+    implementation(project(":ion-compat"))
+    implementation(project(":ion-economy"))
+    implementation(project(":ion-redis"))
+}
+
+// Configure Shadow JAR for the root project to combine all modules
+tasks.withType<ShadowJar> {
+    archiveClassifier.set("") // Produce IonAPI-1.2.0.jar
+    // Merge service files (like plugin.yml if multiple, though unlikely here)
+    mergeServiceFiles()
+}
+
+// Publish the root project's Shadow JAR
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            // Publish the shadow jar artifact
+            artifact(tasks["shadowJar"])
+        }
+    }
+}
 
 // Generate aggregated Javadoc for all modules
 tasks.register<Javadoc>("aggregateJavadoc") {
