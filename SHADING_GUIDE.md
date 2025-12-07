@@ -21,7 +21,7 @@ When multiple plugins use IonAPI without shading, they share the same classes. T
 
 ## 🚀 Gradle (Kotlin DSL) - Recommended
 
-### build.gradle.kts
+### build.gradle.kts (Java 21 Compatible)
 ```kotlin
 plugins {
     java
@@ -39,6 +39,10 @@ dependencies {
     implementation("com.github.mattbaconz:IonAPI:1.2.0")
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 tasks.shadowJar {
     archiveClassifier.set("")
     
@@ -53,10 +57,17 @@ tasks.shadowJar {
 tasks.build {
     dependsOn(tasks.shadowJar)
 }
+```
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
+### Alternative: Gradle 8.5+ with Shadow 8.3.0
+If you encounter ASM issues, ensure you're using Gradle 8.5 or higher:
+
+```bash
+# Check Gradle version
+./gradlew --version
+
+# Upgrade if needed (in gradle/wrapper/gradle-wrapper.properties)
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
 ```
 
 
@@ -262,6 +273,33 @@ If your JAR is too small, shading may have failed.
 
 ## 🔧 Troubleshooting
 
+### Problem: ASM compatibility error with Java 21
+```
+java.lang.IllegalArgumentException: Unsupported class file major version
+```
+
+**Solution**: Use Shadow 8.3.0 with Gradle 8.5+:
+```kotlin
+// build.gradle.kts
+plugins {
+    id("com.gradleup.shadow") version "8.3.0"
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+```
+
+Check your Gradle version:
+```bash
+./gradlew --version
+```
+
+If below 8.5, update `gradle/wrapper/gradle-wrapper.properties`:
+```properties
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+```
+
 ### Problem: Classes not found at runtime
 ```
 java.lang.NoClassDefFoundError: com/ionapi/api/IonPlugin
@@ -339,6 +377,74 @@ com.ionapi.ui.*         → com.yourplugin.libs.ionapi.ui.*
 - **Maven Shade Plugin**: https://maven.apache.org/plugins/maven-shade-plugin/
 - **IonAPI GitHub**: https://github.com/mattbaconz/IonAPI
 - **JitPack**: https://jitpack.io/#mattbaconz/IonAPI
+
+---
+
+## ✅ Complete Working Example (Java 21)
+
+This configuration is tested and working with Java 21:
+
+### build.gradle.kts
+```kotlin
+plugins {
+    java
+    id("com.gradleup.shadow") version "8.3.0"
+}
+
+group = "com.yourname"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+tasks {
+    shadowJar {
+        archiveClassifier.set("")
+        relocate("com.ionapi", "${project.group}.libs.ionapi")
+        minimize()
+    }
+    
+    build {
+        dependsOn(shadowJar)
+    }
+    
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(21)
+    }
+}
+```
+
+### gradle/wrapper/gradle-wrapper.properties
+```properties
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+```
+
+### Build Commands
+```bash
+# Clean build
+./gradlew clean shadowJar
+
+# Verify relocation
+jar tf build/libs/YourPlugin-1.0.0.jar | grep ionapi
+# Should show: com/yourname/libs/ionapi/...
+```
 
 ---
 
