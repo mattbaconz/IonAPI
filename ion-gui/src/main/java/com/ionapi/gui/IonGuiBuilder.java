@@ -507,8 +507,10 @@ public class IonGuiBuilder implements IonGui {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         int slot = event.getRawSlot();
 
+        // Clicking in player's own inventory (bottom inventory)
         if (slot < 0 || slot >= inventory.getSize()) {
-            if (!allowTake && !allowPlace) event.setCancelled(true);
+            // Always cancel to prevent shift-click duping exploits
+            event.setCancelled(true);
             return;
         }
 
@@ -525,10 +527,20 @@ public class IonGuiBuilder implements IonGui {
         Consumer<GuiClickEvent> handler = clickHandlers.get(slot);
         if (handler != null) handler.accept(clickEvent);
 
+        // Cancel event based on permissions and handlers
         if (clickEvent.isCancelled()) {
             event.setCancelled(true);
-        } else if (!allowTake || !allowPlace) {
-            event.setCancelled(true);
+        } else {
+            // Prevent item manipulation unless explicitly allowed
+            boolean isShiftClick = event.isShiftClick();
+            boolean isNumberKey = event.getHotbarButton() >= 0;
+            
+            // Always cancel shift-click and number key presses to prevent duping
+            if (isShiftClick || isNumberKey) {
+                event.setCancelled(true);
+            } else if (!allowTake && !allowPlace) {
+                event.setCancelled(true);
+            }
         }
     }
 
