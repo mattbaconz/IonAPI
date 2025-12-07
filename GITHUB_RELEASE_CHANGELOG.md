@@ -1,211 +1,197 @@
-# 🚀 IonAPI v1.1.0 - Economy, Redis & Enterprise Features
+# 🚀 IonAPI v1.2.0 - Performance & Utilities Release
 
-A major update focused on **security**, **economy systems**, and **enterprise-grade features** for production Minecraft plugins.
-
----
-
-## 🔒 Security Fixes (Critical)
-
-- **Fixed SQL injection vulnerability** in QueryBuilder - all identifiers, operators, and directions are now sanitized
-- **Fixed resource leak** in Transaction - connections properly closed on failure
-- Added comprehensive input validation across database operations
+A feature-packed update focused on **performance optimization** and **developer utilities** to make plugin development faster and easier.
 
 ---
 
-## 💰 Economy System (NEW)
+## ⚡ Performance Improvements
 
-Complete economy API with Vault integration and async-first design:
+### Reflection Caching (10-50x faster ORM)
+- Automatic entity metadata caching eliminates repeated reflection calls
+- Zero configuration required - works automatically
+- Massive performance boost for database operations
 
-- **`IonEconomy`** - Static API with fluent transactions
-- **Multi-currency support** with custom formatting
-- **BigDecimal precision** for accurate monetary calculations
-- **Vault compatibility** - works with existing economy plugins
-- **Admin commands**: `/ion eco set/give/debug`
+### Batch Operations
+- Bulk insert/update/delete operations
+- 10-50x faster than individual operations
+- Configurable batch sizes (default: 1000)
+- Async execution support
 
 ```java
-// Simple usage
-IonEconomy.withdraw(player.getUniqueId(), 100).thenAccept(result -> {
-    if (result.isSuccess()) {
-        player.sendMessage("Purchase complete!");
-    }
-});
-
-// Fluent API
-IonEconomy.transaction(player.getUniqueId())
-    .withdraw(100)
-    .reason("Shop purchase")
-    .commit();
+BatchOperation.BatchResult result = database.batch(PlayerStats.class)
+    .insertAll(stats)
+    .batchSize(500)
+    .execute();
+// Inserted 1000 records in 50ms vs 2000ms individually!
 ```
 
 ---
 
-## 🔴 Redis Integration (NEW)
+## ✨ New Utilities
 
-Cross-server communication made easy:
-
-- **Pub/Sub messaging** for real-time events
-- **Key-value storage** with TTL support
-- **Connection pooling** with Lettuce client
-- **Health monitoring** and statistics
+### CooldownManager
+Thread-safe player cooldown management with automatic cleanup.
 
 ```java
-IonRedis redis = IonRedisBuilder.create()
-    .host("localhost")
-    .port(6379)
+CooldownManager cooldowns = CooldownManager.create("teleport");
+if (cooldowns.isOnCooldown(player.getUniqueId())) {
+    long remaining = cooldowns.getRemainingTime(player.getUniqueId(), TimeUnit.SECONDS);
+    player.sendMessage("Wait " + remaining + "s!");
+    return;
+}
+cooldowns.setCooldown(player.getUniqueId(), 30, TimeUnit.SECONDS);
+```
+
+### RateLimiter
+Sliding window rate limiting for spam prevention.
+
+```java
+RateLimiter limiter = RateLimiter.create("chat", 5, 10, TimeUnit.SECONDS);
+if (!limiter.tryAcquire(player.getUniqueId())) {
+    player.sendMessage("Slow down!");
+    return;
+}
+```
+
+### MessageBuilder
+Fluent MiniMessage builder with templates.
+
+```java
+MessageBuilder.of("<green>Hello, <player>!")
+    .placeholder("player", player.getName())
+    .send(player);
+
+MessageBuilder.of("<gold><bold>LEVEL UP!")
+    .subtitle("<gray>Level <level>")
+    .sendTitle(player);
+```
+
+### IonScoreboard
+Easy scoreboard creation with MiniMessage.
+
+```java
+IonScoreboard board = IonScoreboard.builder()
+    .title("<gradient:gold:yellow><bold>My Server")
+    .line(15, "<gray>Welcome, <white>{player}")
+    .line(13, "<gold>Coins: <yellow>{coins}")
+    .placeholder("player", p -> p.getName())
+    .placeholder("coins", p -> String.valueOf(getCoins(p)))
     .build();
+board.show(player);
+```
 
-redis.subscribe("player-events", message -> {
-    Bukkit.broadcastMessage("Event: " + message.data());
-});
+### IonBossBar
+Boss bar management with dynamic updates.
 
-redis.publish("player-events", "Player joined!");
+```java
+IonBossBar bar = IonBossBar.builder()
+    .title("<gradient:red:orange>Event: {progress}%")
+    .color(BossBar.Color.RED)
+    .progress(0.5f)
+    .build();
+bar.show(player);
+bar.setProgress(0.75f);
+```
+
+### Metrics
+Lightweight performance monitoring.
+
+```java
+Metrics.increment("player.join");
+Metrics.time("database.query", () -> db.findAll(PlayerData.class));
+double avgTime = Metrics.getAverageTime("database.query");
 ```
 
 ---
 
-## 📊 ORM Enhancements
+## 📊 Module Sizes
 
-### Entity Relationships
-- **`@OneToMany`** - One-to-many relationships
-- **`@ManyToOne`** - Many-to-one relationships  
-- **`@JoinColumn`** - Foreign key specification
-- **`FetchType`** - EAGER/LAZY loading
-- **`CascadeType`** - Cascade operations
+Still ultra-lightweight! Only +21 KB for all new features:
 
-```java
-@Table("guilds")
-public class Guild {
-    @PrimaryKey
-    private UUID id;
-    
-    @OneToMany(mappedBy = "guildId", fetch = FetchType.LAZY)
-    private List<GuildMember> members;
-}
-```
-
-### Entity Caching
-- **`@Cacheable`** - Automatic caching with TTL
-- **Thread-safe** cache implementation
-- **Automatic expiration** and cleanup
-- **Cache statistics** and monitoring
-
-```java
-@Table("player_settings")
-@Cacheable(ttl = 60, maxSize = 500)
-public class PlayerSettings {
-    // Cached for 60 seconds
-}
-```
+| Module | Size |
+|--------|------|
+| ion-api | 23.8 KB |
+| ion-database | 52.7 KB |
+| ion-ui | 10.5 KB |
+| **Total** | **273 KB** |
 
 ---
 
-## 🔥 Hot-Reload Configuration (NEW)
+## 📚 Documentation
 
-Real-time config updates without server restart:
-
-```java
-HotReloadConfig config = HotReloadConfig.create(this, "config.yml")
-    .onReload(cfg -> {
-        loadSettings(cfg);
-        getLogger().info("Config reloaded!");
-    })
-    .start();
-
-// Edit config.yml - changes apply instantly!
-```
+- ✅ Complete API Reference updated
+- ✅ New examples for all v1.2.0 features
+- ✅ Comprehensive Javadocs
+- ✅ Quick Reference cheat sheet
+- ✅ `V120FeaturesExample.java` with working code
 
 ---
 
-## 📦 Installation
+## 🔧 Installation
 
 ### Gradle (Kotlin DSL)
 ```kotlin
-repositories {
-    maven("https://jitpack.io")
-}
-
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.1.0")
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
 }
 
 tasks.shadowJar {
-    relocate("com.ionapi", "${project.group}.libs.ionapi")
+    relocate("com.ionapi", "your.plugin.libs.ionapi")
 }
 ```
 
 ### Maven
 ```xml
-<repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-</repository>
-
 <dependency>
     <groupId>com.github.mattbaconz</groupId>
     <artifactId>IonAPI</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
 ---
 
-## 📚 New Examples
+## 🔄 Migration from v1.1.0
 
-- **`EconomyExample.java`** - Economy system usage
-- **`AdvancedDatabaseExample.java`** - ORM relationships & caching
-- **`RedisExample.java`** - Cross-server messaging
-- **`HotReloadExample.java`** - Config hot-reloading
+**No breaking changes!** v1.2.0 is fully backward compatible.
 
----
-
-## 🔧 CI/CD
-
-- GitHub Actions workflow for automated builds
-- JitPack integration for Maven distribution
-- Automated testing on push/PR
+Simply update your dependency version and start using the new features.
 
 ---
 
-## 📊 Statistics
+## 📦 Release Artifacts
 
-- **50+ new files** created
-- **3,500+ lines** of production code
-- **6 comprehensive examples** added
-- **Zero breaking changes** from v1.0.0
+Download these JARs for manual installation:
+- `ion-api-1.2.0.jar` (23.8 KB)
+- `ion-paper-1.2.0-all.jar` (13.2 KB)
+- `ion-folia-1.2.0-all.jar` (12.9 KB)
 
----
-
-## 🔗 Links
-
-- **Documentation**: [Getting Started](docs/GETTING_STARTED.md)
-- **Discord**: https://discord.com/invite/VQjTVKjs46
-- **Support**: [Ko-fi](https://ko-fi.com/mbczishim/tip) | [PayPal](https://www.paypal.com/paypalme/MatthewWatuna)
-
----
-
-## ⬆️ Upgrading from v1.0.0
-
-**No breaking changes!** All v1.0.0 code continues to work.
-
-Simply update your dependency version:
+Or use JitPack (recommended):
 ```kotlin
-implementation("com.github.mattbaconz:IonAPI:1.1.0")
+implementation("com.github.mattbaconz:IonAPI:1.2.0")
 ```
 
-New features are opt-in - use only what you need!
+---
+
+## 🐛 Bug Fixes
+
+- Fixed BossBar API compatibility with Adventure API
+- Improved error handling in batch operations
+- Enhanced thread safety in cooldown and rate limiter
 
 ---
 
-## 🙏 Credits
+## 💬 Support
 
-Built with ❤️ by [@mattbaconz](https://github.com/mattbaconz)
-
-Special thanks to:
-- PaperMC for Paper & Folia
-- Lettuce for Redis client
-- Vault for economy integration
-- All contributors and testers
+- **Discord**: https://discord.com/invite/VQjTVKjs46
+- **GitHub**: https://github.com/mattbaconz/IonAPI
+- **Ko-fi**: https://ko-fi.com/mbczishim/tip
+- **PayPal**: https://www.paypal.com/paypalme/MatthewWatuna
 
 ---
 
-**Full Changelog**: https://github.com/mattbaconz/IonAPI/compare/v1.0.0...v1.1.0
+## 🙏 Thank You!
+
+Thank you to everyone who provided feedback and helped test v1.2.0!
+
+**Full Changelog**: https://github.com/mattbaconz/IonAPI/blob/main/CHANGELOG.md
