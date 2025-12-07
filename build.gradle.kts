@@ -8,6 +8,10 @@ plugins {
     `maven-publish`
 }
 
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 allprojects {
     group = "com.github.mattbaconz"
     version = "1.2.0"
