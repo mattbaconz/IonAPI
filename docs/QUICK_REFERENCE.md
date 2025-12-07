@@ -464,3 +464,77 @@ dependencies {
 **Need help?** Join our [Discord](https://discord.com/invite/VQjTVKjs46)!
 
 **Support:** [Ko-fi](https://ko-fi.com/mbczishim/tip) • [PayPal](https://www.paypal.com/paypalme/MatthewWatuna)
+
+
+---
+
+## 🆕 v1.2.0 Quick Reference
+
+### Cooldowns
+```java
+CooldownManager cooldowns = CooldownManager.create("teleport");
+if (cooldowns.isOnCooldown(uuid)) { /* wait */ }
+cooldowns.setCooldown(uuid, 30, TimeUnit.SECONDS);
+```
+
+### Rate Limiting
+```java
+RateLimiter limiter = RateLimiter.create("chat", 5, 10, TimeUnit.SECONDS);
+if (!limiter.tryAcquire(uuid)) { /* rate limited */ }
+```
+
+### Messages
+```java
+MessageBuilder.of("<green>Hello, <player>!")
+    .placeholder("player", name)
+    .send(player);
+```
+
+### Scoreboard
+```java
+IonScoreboard.builder()
+    .title("<gold>Server")
+    .line(15, "{player}")
+    .placeholder("player", p -> p.getName())
+    .build().show(player);
+```
+
+### Boss Bar
+```java
+IonBossBar.builder()
+    .title("<red>Event: {progress}%")
+    .progress(0.5f)
+    .build().show(player);
+```
+
+### Batch Operations
+```java
+database.batch(Entity.class)
+    .insertAll(list)
+    .execute();
+```
+
+### Metrics
+```java
+Metrics.increment("event");
+Metrics.time("operation", () -> { /* code */ });
+double avg = Metrics.getAverageTime("operation");
+```
+
+---
+
+## 📦 Installation
+
+```kotlin
+dependencies {
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
+}
+```
+
+---
+
+## 💬 Support
+
+- **Discord**: https://discord.com/invite/VQjTVKjs46
+- **GitHub**: https://github.com/mattbaconz/IonAPI
+- **Ko-fi**: https://ko-fi.com/mbczishim/tip

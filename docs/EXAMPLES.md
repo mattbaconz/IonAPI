@@ -295,3 +295,139 @@ For more detailed examples, see:
 ---
 
 **Need help?** Join our [Discord](https://discord.com/invite/VQjTVKjs46)!
+
+
+---
+
+## 🆕 v1.2.0 Features
+
+### Cooldown Manager
+
+```java
+CooldownManager teleportCooldown = CooldownManager.create("teleport");
+
+if (teleportCooldown.isOnCooldown(player.getUniqueId())) {
+    long remaining = teleportCooldown.getRemainingTime(player.getUniqueId(), TimeUnit.SECONDS);
+    player.sendMessage("Wait " + remaining + "s before teleporting!");
+    return;
+}
+
+// Perform teleport...
+teleportCooldown.setCooldown(player.getUniqueId(), 30, TimeUnit.SECONDS);
+```
+
+### Rate Limiter
+
+```java
+// Allow 5 messages per 10 seconds
+RateLimiter chatLimiter = RateLimiter.create("chat", 5, 10, TimeUnit.SECONDS);
+
+if (!chatLimiter.tryAcquire(player.getUniqueId())) {
+    player.sendMessage("Slow down! You're sending messages too fast.");
+    return;
+}
+
+// Process message...
+```
+
+### Message Builder
+
+```java
+// Simple message
+MessageBuilder.of("<green>Welcome back, <player>!")
+    .placeholder("player", player.getName())
+    .send(player);
+
+// Title with subtitle
+MessageBuilder.of("<gold><bold>LEVEL UP!")
+    .subtitle("<gray>You are now level <level>")
+    .placeholder("level", "10")
+    .sendTitle(player);
+
+// Action bar
+MessageBuilder.of("<red>❤ <health>/<max_health>")
+    .placeholder("health", "15")
+    .placeholder("max_health", "20")
+    .sendActionBar(player);
+```
+
+### Scoreboard
+
+```java
+IonScoreboard board = IonScoreboard.builder()
+    .title("<gradient:gold:yellow><bold>My Server")
+    .line(15, "<gray>Welcome, <white>{player}")
+    .line(14, "")
+    .line(13, "<gold>Coins: <yellow>{coins}")
+    .line(12, "<green>Online: <white>{online}")
+    .placeholder("player", p -> p.getName())
+    .placeholder("coins", p -> "1,234")
+    .placeholder("online", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+    .build();
+
+board.show(player);
+```
+
+### Boss Bar
+
+```java
+IonBossBar bar = IonBossBar.builder()
+    .title("<gradient:red:orange>Event Progress: {progress}%")
+    .color(BossBar.Color.RED)
+    .progress(0.5f)
+    .placeholder("progress", p -> "50")
+    .build();
+
+bar.show(player);
+bar.setProgress(0.75f); // Update progress
+```
+
+### Batch Operations
+
+```java
+List<PlayerStats> stats = new ArrayList<>();
+for (int i = 0; i < 1000; i++) {
+    stats.add(new PlayerStats(UUID.randomUUID(), 0, 0));
+}
+
+// 10-50x faster than individual inserts!
+BatchOperation.BatchResult result = database.batch(PlayerStats.class)
+    .insertAll(stats)
+    .batchSize(500)
+    .execute();
+
+System.out.println("Inserted " + result.insertedCount() + " records in " + result.executionTimeMs() + "ms");
+```
+
+### Metrics
+
+```java
+// Count events
+Metrics.increment("player.join");
+Metrics.increment("commands.executed");
+
+// Set gauge values
+Metrics.gauge("players.online", Bukkit.getOnlinePlayers().size());
+
+// Time operations
+String result = Metrics.time("database.query", () -> {
+    return database.findAll(PlayerData.class);
+});
+
+// Get statistics
+double avgTime = Metrics.getAverageTime("database.query");
+System.out.println("Average query time: " + avgTime + "ms");
+```
+
+---
+
+## 📚 More Examples
+
+See `examples/V120FeaturesExample.java` for complete working examples of all v1.2.0 features.
+
+---
+
+## 💬 Support
+
+- **Discord**: https://discord.com/invite/VQjTVKjs46
+- **GitHub**: https://github.com/mattbaconz/IonAPI
