@@ -88,8 +88,14 @@ tasks.withType<ShadowJar> {
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = "IonAPI"
+            version = project.version.toString()
+            
             // Publish the shadow jar artifact
-            artifact(tasks["shadowJar"])
+            artifact(tasks["shadowJar"]) {
+                classifier = ""
+            }
         }
     }
 }
