@@ -155,15 +155,17 @@ ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
 </table>
 
 ### 🌟 Additional Modules
-- 💰 **Economy System** - Vault-compatible with async API
-- 🔴 **Redis Integration** - Pub/sub messaging + KV storage
-- 🔥 **Hot-Reload Config** - Auto-reload on file changes
-- 🔌 **Cross-Server Messaging** - Velocity/BungeeCord support
-- 👻 **Packet NPCs** - Lightweight, zero-tick NPCs
-- 🏷️ **PlaceholderAPI Bridge** - Auto-registration
-- 💉 **Dependency Injection** - Clean architecture
-- 🧪 **Unit Testing** - Mock framework
-- 🔄 **Compatibility Layer** - Java 8+ polyfills
+- 💰 **Economy System** - Vault-compatible with async API (~14 KB)
+- 🔴 **Redis Integration** - Pub/sub messaging + KV storage (~9 KB + Lettuce)
+- 🔥 **Hot-Reload Config** - Auto-reload on file changes (built-in)
+- 🔌 **Cross-Server Messaging** - Velocity/BungeeCord support (~11 KB)
+- 👻 **Packet NPCs** - Lightweight, zero-tick NPCs (~24 KB)
+- 🏷️ **PlaceholderAPI Bridge** - Auto-registration (~7 KB)
+- 💉 **Dependency Injection** - Clean architecture (~6 KB)
+- 🧪 **Unit Testing** - Mock framework (~21 KB)
+- 🔄 **Compatibility Layer** - Java 8+ polyfills (~38 KB)
+
+**Total size (all modules): ~252 KB** - Smaller than most images!
 
 ---
 

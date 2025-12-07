@@ -171,7 +171,7 @@ plugin.getScheduler().runAt(player, () -> {
 
 ```kotlin
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.0.0")
+    implementation("com.github.mattbaconz:IonAPI:1.1.0")
 }
 
 tasks.shadowJar {

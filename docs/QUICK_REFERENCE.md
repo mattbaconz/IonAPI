@@ -417,17 +417,14 @@ import com.ionapi.npc.IonNPC;
 
 ```kotlin
 dependencies {
-    // Core (required)
-    compileOnly("com.ionapi:ion-api:1.0.0")
+    // All-in-one (easiest - recommended)
+    implementation("com.github.mattbaconz:IonAPI:1.1.0")
     
-    // Features (optional)
-    implementation("com.ionapi:ion-item:1.0.0")
-    implementation("com.ionapi:ion-gui:1.0.0")
-    implementation("com.ionapi:ion-ui:1.0.0")
-    implementation("com.ionapi:ion-tasks:1.0.0")
-    implementation("com.ionapi:ion-database:1.0.0")
-    implementation("com.ionapi:ion-proxy:1.0.0")
-    implementation("com.ionapi:ion-npc:1.0.0")
+    // OR individual modules:
+    // compileOnly("com.ionapi:ion-api:1.1.0")
+    // implementation("com.ionapi:ion-database:1.1.0")
+    // implementation("com.ionapi:ion-economy:1.1.0")
+    // implementation("com.ionapi:ion-gui:1.1.0")
 }
 ```
 

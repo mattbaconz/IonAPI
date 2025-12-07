@@ -36,14 +36,13 @@ repositories {
 }
 
 dependencies {
-    // Core API (required)
-    compileOnly("com.ionapi:ion-api:1.0.0-SNAPSHOT")
+    // All-in-one (recommended)
+    implementation("com.github.mattbaconz:IonAPI:1.1.0")
     
-    // Optional: Extended features
-    implementation("com.ionapi:ion-item:1.0.0-SNAPSHOT")
-    implementation("com.ionapi:ion-gui:1.0.0-SNAPSHOT")
-    implementation("com.ionapi:ion-ui:1.0.0-SNAPSHOT")
-    implementation("com.ionapi:ion-tasks:1.0.0-SNAPSHOT")
+    // OR individual modules:
+    // implementation("com.ionapi:ion-api:1.1.0")
+    // implementation("com.ionapi:ion-database:1.1.0")
+    // implementation("com.ionapi:ion-economy:1.1.0")
 }
 ```
 
@@ -55,9 +54,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.ionapi:ion-api:1.0.0-SNAPSHOT'
-    implementation 'com.ionapi:ion-item:1.0.0-SNAPSHOT'
-    implementation 'com.ionapi:ion-gui:1.0.0-SNAPSHOT'
+    implementation 'com.github.mattbaconz:IonAPI:1.1.0'
 }
 ```
 
@@ -65,10 +62,9 @@ dependencies {
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.ionapi</groupId>
-        <artifactId>ion-api</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <scope>provided</scope>
+        <groupId>com.github.mattbaconz</groupId>
+        <artifactId>IonAPI</artifactId>
+        <version>1.1.0</version>
     </dependency>
 </dependencies>
 ```
