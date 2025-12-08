@@ -67,17 +67,9 @@ public abstract class IonPluginImpl extends JavaPlugin implements IonPlugin {
         return eventBus;
     }
 
-    @Override
-    @NotNull
-    public File getDataFolder() {
-        return super.getDataFolder();
-    }
 
-    @Override
-    @NotNull
-    public Logger getLogger() {
-        return super.getLogger();
-    }
+
+
 
     // -- Abstract methods to be implemented by platform-specific subclasses or
     // factories --
@@ -100,15 +92,15 @@ public abstract class IonPluginImpl extends JavaPlugin implements IonPlugin {
         // Actually, to make it valid java, I'll need to implement a dummy or find
         // existing.
         // Let's check imports.
-        return new com.ionapi.api.command.SimpleCommandRegistry(this);
+        return new com.ionapi.core.impl.SimpleCommandRegistry(this);
     }
 
     protected ConfigurationProvider createConfigProvider() {
-        return new com.ionapi.api.config.SimpleConfigProvider(this);
+        return new com.ionapi.core.impl.SimpleConfigProvider(this);
     }
 
     protected EventBus createEventBus() {
-        return new com.ionapi.api.event.SimpleEventBus(this);
+        return new com.ionapi.core.impl.SimpleEventBus(this);
     }
 
     // IonScheduler is platform specific, so we leave it abstract here?
