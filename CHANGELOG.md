@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.5] - 2024-12-09
+
+### 🚀 Platform Support
+*   **Full Paper Support**: Native implementation via `IonPaperPlugin` tailored for high performance.
+*   **Full Folia Support**: Native implementation via `IonFoliaPlugin` with support for regionized threading.
+
+### ✨ Features
+*   **Unified Scheduler**:
+    *   Automatically detects platform (Paper vs Folia).
+    *   Added `runAt(Entity, ...)` and `runAt(Location, ...)` for context-aware scheduling.
+    *   Safe delegation to `RegionScheduler` and `GlobalRegionScheduler` on Folia.
+*   **Core Services**: Implemented default providers for CommandRegistry, ConfigurationProvider, and EventBus.
+
+### 🐛 Fixes
+*   Fixed `ion-core` build failure by adding missing `paper-api` dependency.
+*   Resolved conflicting method overrides (`getDataFolder`, `getLogger`) in `IonPluginImpl`.
+
+---
+
 ## [1.2.0] - 2024-12-07
 
 ### ⚡ Performance
