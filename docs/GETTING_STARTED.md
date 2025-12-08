@@ -13,18 +13,6 @@ A comprehensive guide to building Minecraft plugins with IonAPI.
 7. [Best Practices](#best-practices)
 8. [Next Steps](#next-steps)
 
----
-
-## Prerequisites
-
-- **Java 21 or higher**
-- **Gradle 8.0+** or Maven 3.8+
-- **Paper or Folia server** (1.20+)
-- Basic Java knowledge
-
----
-
-## Installation
 
 ### Step 1: Add IonAPI to Your Project
 

@@ -15,13 +15,13 @@ Pick only the modules you need:
 ```kotlin
 dependencies {
     // Core (always needed)
-    implementation("com.github.mattbaconz.IonAPI:ion-api:1.1.0")
-    implementation("com.github.mattbaconz.IonAPI:ion-core:1.1.0")
+    implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
+    implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
     
     // Add only what you need
-    implementation("com.github.mattbaconz.IonAPI:ion-database:1.1.0")
-    implementation("com.github.mattbaconz.IonAPI:ion-economy:1.1.0")
-    implementation("com.github.mattbaconz.IonAPI:ion-gui:1.1.0")
+    implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
+    implementation("com.github.mattbaconz.IonAPI:ion-economy:1.2.5")
+    implementation("com.github.mattbaconz.IonAPI:ion-gui:1.2.5")
 }
 ```
 
@@ -37,7 +37,7 @@ Use the complete IonAPI bundle:
 ```kotlin
 dependencies {
     // Everything in one dependency!
-    implementation("com.github.mattbaconz:IonAPI:1.1.0")
+    implementation("com.github.mattbaconz:IonAPI:1.2.5")
 }
 ```
 
@@ -70,12 +70,12 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     
     // IonAPI - All-in-one
-    implementation("com.github.mattbaconz:IonAPI:1.1.0")
+    implementation("com.github.mattbaconz:IonAPI:1.2.5")
     
     // OR individual modules:
-    // implementation("com.github.mattbaconz.IonAPI:ion-api:1.1.0")
-    // implementation("com.github.mattbaconz.IonAPI:ion-database:1.1.0")
-    // implementation("com.github.mattbaconz.IonAPI:ion-economy:1.1.0")
+    // implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
+    // implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
+    // implementation("com.github.mattbaconz.IonAPI:ion-economy:1.2.5")
 }
 
 tasks {
@@ -173,40 +173,40 @@ ion-api (core)
 
 ### Minimal Plugin (Commands + Config)
 ```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.1.0")
+implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
 ```
 **Size**: ~50 KB
 
 ### Database Plugin
 ```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-database:1.1.0")
+implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
 ```
 **Size**: ~100 KB
 
 ### GUI Plugin
 ```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-gui:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-item:1.1.0")
+implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-gui:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-item:1.2.5")
 ```
 **Size**: ~80 KB
 
 ### Economy Plugin
 ```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-database:1.1.0")
-implementation("com.github.mattbaconz.IonAPI:ion-economy:1.1.0")
+implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
+implementation("com.github.mattbaconz.IonAPI:ion-economy:1.2.5")
 ```
 **Size**: ~120 KB
 
 ### Full-Featured Plugin (Everything)
 ```kotlin
-implementation("com.github.mattbaconz:IonAPI:1.1.0")
+implementation("com.github.mattbaconz:IonAPI:1.2.5")
 ```
 **Size**: ~500 KB (or ~2 MB with Redis)
 

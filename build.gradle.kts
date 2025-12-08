@@ -14,7 +14,7 @@ java {
 
 allprojects {
     group = "com.github.mattbaconz"
-    version = "1.2.0"
+    version = "1.2.5"
 
     repositories {
         mavenCentral()
