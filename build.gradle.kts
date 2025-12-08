@@ -82,7 +82,7 @@ tasks.withType<ShadowJar> {
     // Merge service files (like plugin.yml if multiple, though unlikely here)
     mergeServiceFiles()
     // Minimize to remove unused classes
-    minimize()
+    // minimize() // Removed to prevent empty JAR when root project has no code
 }
 
 // Publish the root project's Shadow JAR
