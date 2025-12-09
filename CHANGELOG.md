@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.2.5] - 2024-12-09
+## [1.2.5] - 2025-12-09
 
 ### 🚀 Platform Support
 *   **Full Paper Support**: Native implementation via `IonPaperPlugin` tailored for high performance.
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.2.6] - 2024-12-09
+## [1.2.6] - 2025-12-09
 
 ### 🚀 Improvements
 *   **Build Fix**: Resolved artifact conflict for correct JitPack building.
