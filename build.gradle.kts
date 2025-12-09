@@ -14,6 +14,7 @@ java {
 
 // Disable the default jar task for the root project to prevent conflict with shadowJar publishing
 tasks.jar {
+    archiveClassifier.set("bare")
     enabled = false
 }
 
