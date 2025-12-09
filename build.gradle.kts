@@ -12,6 +12,11 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
+// Disable the default jar task for the root project to prevent conflict with shadowJar publishing
+tasks.jar {
+    enabled = false
+}
+
 allprojects {
     group = "com.github.mattbaconz"
     version = "1.2.5"
