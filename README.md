@@ -619,6 +619,8 @@ HotReloadConfig config = HotReloadConfig.create(this, "config.yml")
 ### 🔧 Advanced
 - [Migration Guide](docs/MIGRATION_GUIDE.md)
 - [Shading Guide](docs/SHADING.md)
+- [Upgrade Guide](docs/UPGRADE.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 </td>
 </tr>

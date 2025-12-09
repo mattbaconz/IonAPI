@@ -280,7 +280,7 @@ db.findAsync(PlayerData.class, uuid).thenAccept(data -> {
 If you discover a security vulnerability in IonAPI:
 
 1. **DO NOT** open a public GitHub issue
-2. **DO** email: [Your security email]
+2. **DO** email: mattdabigsigma@gmail.com
 3. **DO** provide:
    - Description of the vulnerability
    - Steps to reproduce
