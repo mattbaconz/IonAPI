@@ -418,13 +418,13 @@ import com.ionapi.npc.IonNPC;
 ```kotlin
 dependencies {
     // All-in-one (easiest - recommended)
-    implementation("com.github.mattbaconz:IonAPI:1.1.0")
+    implementation("com.github.mattbaconz:IonAPI:1.2.6")
     
     // OR individual modules:
-    // compileOnly("com.ionapi:ion-api:1.1.0")
-    // implementation("com.ionapi:ion-database:1.1.0")
-    // implementation("com.ionapi:ion-economy:1.1.0")
-    // implementation("com.ionapi:ion-gui:1.1.0")
+    // compileOnly("com.ionapi:ion-api:1.2.6")
+    // implementation("com.ionapi:ion-database:1.2.6")
+    // implementation("com.ionapi:ion-economy:1.2.6")
+    // implementation("com.ionapi:ion-gui:1.2.6")
 }
 ```
 
@@ -468,7 +468,7 @@ dependencies {
 
 ---
 
-## 🆕 v1.2.0 Quick Reference
+## 🆕 v1.2.6 Quick Reference
 
 ### Cooldowns
 ```java
@@ -527,7 +527,7 @@ double avg = Metrics.getAverageTime("operation");
 
 ```kotlin
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.2.0")
+    implementation("com.github.mattbaconz:IonAPI:1.2.6")
 }
 ```
 

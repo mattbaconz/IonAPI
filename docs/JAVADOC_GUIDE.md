@@ -2,7 +2,7 @@
 
 ## 🌐 Online Javadoc
 
-**Latest version**: https://javadoc.jitpack.io/com/github/mattbaconz/IonAPI/1.1.0/javadoc/
+**Latest version**: https://javadoc.jitpack.io/com/github/mattbaconz/IonAPI/1.2.6/javadoc/
 
 Browse the complete API documentation online!
 
@@ -38,7 +38,7 @@ Javadoc JARs are automatically generated for each module:
 ./gradlew build
 ```
 
-Find them in: `<module>/build/libs/<module>-1.1.0-javadoc.jar`
+Find them in: `<module>/build/libs/<module>-1.2.6-javadoc.jar`
 
 ---
 
@@ -57,7 +57,7 @@ Javadoc is automatically downloaded when you add IonAPI as a dependency via JitP
 1. Right-click on project → Properties
 2. Java Build Path → Libraries
 3. Expand IonAPI → Javadoc location
-4. Edit → Enter: `https://javadoc.jitpack.io/com/github/mattbaconz/IonAPI/1.1.0/javadoc/`
+4. Edit → Enter: `https://javadoc.jitpack.io/com/github/mattbaconz/IonAPI/1.2.6/javadoc/`
 
 ### VS Code
 
@@ -91,7 +91,7 @@ Install "Java Extension Pack" - Javadoc is automatically fetched.
 
 ## 💡 Quick Links
 
-- **Full API**: https://javadoc.jitpack.io/com/github/mattbaconz/IonAPI/1.1.0/javadoc/
+- **Full API**: https://javadoc.jitpack.io/com/github/mattbaconz/IonAPI/1.2.6/javadoc/
 - **GitHub**: https://github.com/mattbaconz/IonAPI
 - **Examples**: See `examples/` folder
 - **Discord**: https://discord.com/invite/VQjTVKjs46
@@ -108,4 +108,4 @@ When browsing Javadoc:
 
 ---
 
-**Generated with ❤️ by IonAPI v1.1.0**
+**Generated with ❤️ by IonAPI v1.2.6**

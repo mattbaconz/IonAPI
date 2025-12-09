@@ -420,7 +420,7 @@ tasks.shadowJar {
 
 **That's it!** 🎉
 
-> 💡 **Why relocate?** Prevents conflicts when multiple plugins use IonAPI. See [SHADING_GUIDE.md](SHADING_GUIDE.md) for details.
+> 💡 **Why relocate?** Prevents conflicts when multiple plugins use IonAPI. See [SHADING_GUIDE.md](docs/SHADING.md) for details.
 
 ---
 

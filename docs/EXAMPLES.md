@@ -299,7 +299,7 @@ For more detailed examples, see:
 
 ---
 
-## 🆕 v1.2.0 Features
+## 🆕 v1.2.6 Features
 
 ### Cooldown Manager
 

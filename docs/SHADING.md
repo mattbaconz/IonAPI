@@ -1,55 +1,390 @@
 # 📦 IonAPI Shading Guide
 
-## ✅ Yes, IonAPI is Designed for Easy Shading!
+Complete guide for properly shading IonAPI into your Minecraft plugin to avoid conflicts.
 
-IonAPI is **specifically built** to be easily shadable into your plugins. Here's everything you need to know.
+**Version**: 1.2.6  
+**Last Updated**: December 7, 2025
 
 ---
 
-## 🎯 Two Ways to Use IonAPI
+## ⚠️ Why Shading is Required
 
-### Option 1: Individual Modules (Recommended for Small Plugins)
+When multiple plugins use IonAPI without shading, they share the same classes. This causes:
+- **Version conflicts**: Plugin A uses v1.1.0, Plugin B uses v1.2.0 → crashes
+- **ClassNotFoundException**: Classes loaded by wrong plugin
+- **NoSuchMethodError**: Method signatures changed between versions
+- **Data corruption**: Shared static state between plugins
 
-Pick only the modules you need:
+**Solution**: Relocate IonAPI classes to your plugin's unique package.
 
+---
+
+## 🚀 Gradle (Kotlin DSL) - Recommended
+
+### build.gradle.kts (Java 21 Compatible)
 ```kotlin
+plugins {
+    java
+    id("com.gradleup.shadow") version "8.3.0"
+}
+
+repositories {
+    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://jitpack.io")
+}
+
 dependencies {
-    // Core (always needed)
-    implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
-    implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
     
-    // Add only what you need
-    implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
-    implementation("com.github.mattbaconz.IonAPI:ion-economy:1.2.5")
-    implementation("com.github.mattbaconz.IonAPI:ion-gui:1.2.5")
+    // ⚠️ CRITICAL: Relocate to YOUR package
+    relocate("com.ionapi", "com.yourname.yourplugin.libs.ionapi")
+    
+    // Optional: Minimize JAR size (removes unused classes)
+    minimize()
+}
+
+// Make 'build' task produce the shaded JAR
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
 ```
 
-**Pros**: Smaller JAR size, only include what you use  
-**Cons**: Need to specify each module
+### Alternative: Gradle 8.5+ with Shadow 8.3.0
+If you encounter ASM issues, ensure you're using Gradle 8.5 or higher:
+
+```bash
+# Check Gradle version
+./gradlew --version
+
+# Upgrade if needed (in gradle/wrapper/gradle-wrapper.properties)
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+```
+
+
+### Build Command
+```bash
+./gradlew shadowJar
+```
+
+Output: `build/libs/YourPlugin-1.0.0.jar` (shaded)
 
 ---
 
-### Option 2: All-in-One JAR (Easiest)
+## 🚀 Gradle (Groovy DSL)
 
-Use the complete IonAPI bundle:
+### build.gradle
+```groovy
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '8.3.0'
+}
 
-```kotlin
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
-    // Everything in one dependency!
-    implementation("com.github.mattbaconz:IonAPI:1.2.5")
+    compileOnly 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
+    implementation 'com.github.mattbaconz:IonAPI:1.2.0'
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    
+    // ⚠️ CRITICAL: Relocate to YOUR package
+    relocate 'com.ionapi', 'com.yourname.yourplugin.libs.ionapi'
+    
+    minimize()
+}
+
+build.dependsOn shadowJar
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 ```
 
-**Pros**: Single dependency, includes everything  
-**Cons**: Larger JAR size (~500KB)
+---
+
+## 🚀 Maven
+
+### pom.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.yourname</groupId>
+    <artifactId>YourPlugin</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.20.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.mattbaconz</groupId>
+            <artifactId>IonAPI</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <relocations>
+                                <!-- ⚠️ CRITICAL: Relocate to YOUR package -->
+                                <relocation>
+                                    <pattern>com.ionapi</pattern>
+                                    <shadedPattern>com.yourname.yourplugin.libs.ionapi</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <minimizeJar>true</minimizeJar>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+### Build Command
+```bash
+mvn package
+```
+
+Output: `target/YourPlugin-1.0.0.jar` (shaded)
+
 
 ---
 
-## 🔧 Complete Shading Setup
+## 📋 Relocation Examples
 
-### build.gradle.kts (Full Example)
+### Correct Relocation Patterns
+```kotlin
+// ✅ Good - Unique to your plugin
+relocate("com.ionapi", "com.yourname.yourplugin.libs.ionapi")
+relocate("com.ionapi", "me.developer.myplugin.shaded.ionapi")
+relocate("com.ionapi", "net.myserver.plugin.internal.ionapi")
 
+// ❌ Bad - Too generic, may conflict
+relocate("com.ionapi", "libs.ionapi")
+relocate("com.ionapi", "shaded.ionapi")
+```
+
+### Multiple Dependencies
+```kotlin
+tasks.shadowJar {
+    // IonAPI
+    relocate("com.ionapi", "${project.group}.libs.ionapi")
+    
+    // Other common libraries (if you use them)
+    relocate("com.zaxxer.hikari", "${project.group}.libs.hikari")
+    relocate("org.slf4j", "${project.group}.libs.slf4j")
+}
+```
+
+---
+
+## ✅ Verification
+
+### Check Your Shaded JAR
+After building, verify the relocation worked:
+
+```bash
+# List contents of JAR
+jar tf build/libs/YourPlugin-1.0.0.jar | grep ionapi
+```
+
+**Expected output:**
+```
+com/yourname/yourplugin/libs/ionapi/api/IonPlugin.class
+com/yourname/yourplugin/libs/ionapi/database/IonDatabase.class
+...
+```
+
+**Bad output (not relocated):**
+```
+com/ionapi/api/IonPlugin.class
+com/ionapi/database/IonDatabase.class
+```
+
+### Check JAR Size
+Your shaded JAR should be larger than your source code alone:
+
+| Component | Approximate Size |
+|-----------|------------------|
+| Your code | ~50-200 KB |
+| IonAPI | ~273 KB |
+| **Total** | ~323-473 KB |
+
+If your JAR is too small, shading may have failed.
+
+---
+
+## 🔧 Troubleshooting
+
+### Problem: ASM compatibility error with Java 21
+```
+java.lang.IllegalArgumentException: Unsupported class file major version
+```
+
+**Solution**: Use Shadow 8.3.0 with Gradle 8.5+:
+```kotlin
+// build.gradle.kts
+plugins {
+    id("com.gradleup.shadow") version "8.3.0"
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+```
+
+Check your Gradle version:
+```bash
+./gradlew --version
+```
+
+If below 8.5, update `gradle/wrapper/gradle-wrapper.properties`:
+```properties
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+```
+
+### Problem: Classes not found at runtime
+```
+java.lang.NoClassDefFoundError: com/ionapi/api/IonPlugin
+```
+
+**Solution**: Ensure `implementation` (not `compileOnly`) and shadowJar is configured.
+
+### Problem: Relocation not working
+**Solution**: Check shadowJar task is actually running:
+```kotlin
+tasks.build {
+    dependsOn(tasks.shadowJar)
+}
+```
+
+### Problem: JAR too large
+**Solution**: Enable minimize:
+```kotlin
+tasks.shadowJar {
+    minimize()
+}
+```
+
+### Problem: Missing classes after minimize
+**Solution**: Exclude specific packages from minimization:
+```kotlin
+tasks.shadowJar {
+    minimize {
+        exclude(dependency("com.github.mattbaconz:IonAPI:.*"))
+    }
+}
+```
+
+### Problem: Duplicate class errors
+**Solution**: You have multiple versions. Check all dependencies:
+```bash
+./gradlew dependencies --configuration runtimeClasspath
+```
+
+---
+
+## 📦 What Gets Shaded
+
+When you shade IonAPI, these packages are included:
+
+```
+com.ionapi.api.*        → com.yourplugin.libs.ionapi.api.*
+com.ionapi.core.*       → com.yourplugin.libs.ionapi.core.*
+com.ionapi.database.*   → com.yourplugin.libs.ionapi.database.*
+com.ionapi.economy.*    → com.yourplugin.libs.ionapi.economy.*
+com.ionapi.gui.*        → com.yourplugin.libs.ionapi.gui.*
+com.ionapi.item.*       → com.yourplugin.libs.ionapi.item.*
+com.ionapi.redis.*      → com.yourplugin.libs.ionapi.redis.*
+com.ionapi.tasks.*      → com.yourplugin.libs.ionapi.tasks.*
+com.ionapi.ui.*         → com.yourplugin.libs.ionapi.ui.*
+... (all modules)
+```
+
+---
+
+## 🎯 Best Practices
+
+1. **Always relocate** - Never ship IonAPI without relocation
+2. **Use unique package** - Include your name/organization
+3. **Use minimize()** - Reduces JAR size by removing unused classes
+4. **Test thoroughly** - Verify all features work after shading
+5. **Check JAR contents** - Confirm relocation with `jar tf`
+6. **Update regularly** - Keep IonAPI version current
+
+---
+
+## 📚 Resources
+
+- **Shadow Plugin Docs**: https://gradleup.com/shadow/
+- **Maven Shade Plugin**: https://maven.apache.org/plugins/maven-shade-plugin/
+- **IonAPI GitHub**: https://github.com/mattbaconz/IonAPI
+- **JitPack**: https://jitpack.io/#mattbaconz/IonAPI
+
+---
+
+## ✅ Complete Working Example (Java 21)
+
+This configuration is tested and working with Java 21:
+
+### build.gradle.kts
 ```kotlin
 plugins {
     java
@@ -66,190 +401,170 @@ repositories {
 }
 
 dependencies {
-    // Paper API
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    
-    // IonAPI - All-in-one
-    implementation("com.github.mattbaconz:IonAPI:1.2.5")
-    
-    // OR individual modules:
-    // implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
-    // implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
-    // implementation("com.github.mattbaconz.IonAPI:ion-economy:1.2.5")
-}
-
-tasks {
-    shadowJar {
-        archiveClassifier.set("")
-        
-        // ⚠️ CRITICAL: Always relocate to avoid conflicts!
-        relocate("com.ionapi", "${project.group}.libs.ionapi")
-        
-        // Relocate third-party libraries
-        relocate("io.lettuce", "${project.group}.libs.lettuce")
-        
-        // Optional: Minimize JAR size
-        minimize()
-        
-        // Exclude unnecessary files
-        exclude("META-INF/*.SF")
-        exclude("META-INF/*.DSA")
-        exclude("META-INF/*.RSA")
-    }
-    
-    build {
-        dependsOn(shadowJar)
-    }
+    implementation("com.github.mattbaconz:IonAPI:1.2.0")
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
+
+tasks {
+    shadowJar {
+        archiveClassifier.set("")
+        relocate("com.ionapi", "${project.group}.libs.ionapi")
+        minimize()
+    }
+    
+    build {
+        dependsOn(shadowJar)
+    }
+    
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(21)
+    }
+}
 ```
 
----
+### gradle/wrapper/gradle-wrapper.properties
+```properties
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+```
 
-## 🚀 Build Your Plugin
-
+### Build Commands
 ```bash
-./gradlew shadowJar
-```
+# Clean build
+./gradlew clean shadowJar
 
-Your plugin JAR will be in: `build/libs/YourPlugin-1.0.0.jar`
-
----
-
-## 📊 JAR Size Comparison
-
-| Configuration | Approximate Size |
-|--------------|------------------|
-| Core only (ion-api + ion-core) | ~50 KB |
-| + Database | ~100 KB |
-| + Economy | ~120 KB |
-| + GUI + Items | ~150 KB |
-| **All modules** | **~500 KB** |
-| With Redis (includes Lettuce) | ~2 MB |
-
----
-
-## ⚠️ Important: Always Relocate!
-
-**Why?** If two plugins use different versions of IonAPI without relocation, they'll conflict.
-
-```kotlin
-// ✅ GOOD - Relocates to your package
-relocate("com.ionapi", "com.yourplugin.libs.ionapi")
-
-// ❌ BAD - No relocation = conflicts!
-// (Don't do this)
+# Verify relocation
+jar tf build/libs/YourPlugin-1.0.0.jar | grep ionapi
+# Should show: com/yourname/libs/ionapi/...
 ```
 
 ---
 
-## 🎯 Module Dependencies
+## 🎯 Advanced Relocation Examples
 
-If using individual modules, here are the dependencies:
+### Multiple Plugins on Same Server
+If you have multiple plugins using IonAPI, each MUST relocate to avoid conflicts:
 
+**Plugin A:**
+```kotlin
+relocate("com.ionapi", "com.plugina.libs.ionapi")
 ```
-ion-api (core)
-├── ion-core (platform abstraction)
-├── ion-database (requires: ion-api, ion-core)
-├── ion-economy (requires: ion-api, ion-database)
-├── ion-redis (requires: ion-api)
-├── ion-gui (requires: ion-api, ion-core, ion-item)
-├── ion-item (requires: ion-api, ion-core)
-├── ion-tasks (requires: ion-api, ion-core)
-├── ion-proxy (requires: ion-api, ion-core)
-├── ion-npc (requires: ion-api, ion-core)
-├── ion-placeholder (requires: ion-api, ion-core)
-├── ion-inject (requires: ion-api)
-├── ion-test (requires: ion-api, ion-core)
-└── ion-compat (requires: ion-api)
+
+**Plugin B:**
+```kotlin
+relocate("com.ionapi", "com.pluginb.libs.ionapi")
+```
+
+### Relocating Dependencies
+If you're using optional features that require dependencies:
+
+```kotlin
+tasks.shadowJar {
+    // Relocate IonAPI
+    relocate("com.ionapi", "${project.group}.libs.ionapi")
+    
+    // If using Redis (optional)
+    relocate("io.lettuce", "${project.group}.libs.lettuce")
+    
+    // If using custom database driver
+    relocate("org.xerial", "${project.group}.libs.sqlite")
+    
+    minimize()
+}
+```
+
+### Excluding Specific Classes
+Sometimes you want to exclude certain classes from relocation:
+
+```kotlin
+tasks.shadowJar {
+    relocate("com.ionapi", "${project.group}.libs.ionapi") {
+        // Don't relocate API interfaces (if you want them accessible)
+        exclude("com.ionapi.api.IonPlugin")
+    }
+}
 ```
 
 ---
 
-## 💡 Recommended Configurations
+## 🧪 Testing Relocation
 
-### Minimal Plugin (Commands + Config)
-```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
-```
-**Size**: ~50 KB
-
-### Database Plugin
-```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
-```
-**Size**: ~100 KB
-
-### GUI Plugin
-```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-gui:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-item:1.2.5")
-```
-**Size**: ~80 KB
-
-### Economy Plugin
-```kotlin
-implementation("com.github.mattbaconz.IonAPI:ion-api:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-core:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-database:1.2.5")
-implementation("com.github.mattbaconz.IonAPI:ion-economy:1.2.5")
-```
-**Size**: ~120 KB
-
-### Full-Featured Plugin (Everything)
-```kotlin
-implementation("com.github.mattbaconz:IonAPI:1.2.5")
-```
-**Size**: ~500 KB (or ~2 MB with Redis)
-
----
-
-## 🔍 Verify Shading
-
-After building, check your JAR:
-
+### 1. Build Your Plugin
 ```bash
-# Windows
-jar tf build/libs/YourPlugin-1.0.0.jar | findstr ionapi
+./gradlew clean shadowJar
+```
+
+### 2. Check JAR Contents
+```bash
+# Windows PowerShell
+jar tf build/libs/YourPlugin-1.0.0.jar | Select-String "ionapi"
 
 # Linux/Mac
 jar tf build/libs/YourPlugin-1.0.0.jar | grep ionapi
 ```
 
-You should see paths like:
+### 3. Expected Output
 ```
-com/yourplugin/libs/ionapi/api/IonPlugin.class
-com/yourplugin/libs/ionapi/database/IonDatabase.class
+com/yourname/libs/ionapi/api/IonPlugin.class
+com/yourname/libs/ionapi/database/IonDatabase.class
+com/yourname/libs/ionapi/gui/IonGui.class
+...
 ```
 
-If you see `com/ionapi/` instead, relocation didn't work!
+### 4. Wrong Output (Not Relocated)
+```
+com/ionapi/api/IonPlugin.class  ❌ BAD - Will conflict!
+```
 
 ---
 
-## ✅ Summary
+## ⚠️ Common Relocation Mistakes
 
-**Yes, IonAPI is VERY easy to shade!**
+### Mistake 1: Forgetting to Relocate
+```kotlin
+// ❌ BAD - No relocation
+tasks.shadowJar {
+    archiveClassifier.set("")
+}
+```
 
-1. Add Shadow plugin
-2. Add IonAPI dependency (all-in-one or individual modules)
-3. Add relocation rule
-4. Run `./gradlew shadowJar`
-5. Done!
+**Result**: Conflicts with other plugins using IonAPI
 
-**Total setup time**: < 2 minutes
+### Mistake 2: Generic Relocation
+```kotlin
+// ❌ BAD - Too generic
+relocate("com.ionapi", "libs.ionapi")
+```
+
+**Result**: Still conflicts if another plugin uses `libs.ionapi`
+
+### Mistake 3: Not Using Shadow Plugin
+```kotlin
+// ❌ BAD - Regular JAR task
+tasks.jar {
+    from(configurations.runtimeClasspath.get().map { zipTree(it) })
+}
+```
+
+**Result**: No relocation, classes conflict
+
+### Correct Way
+```kotlin
+// ✅ GOOD
+tasks.shadowJar {
+    relocate("com.ionapi", "com.yourname.yourplugin.libs.ionapi")
+    minimize()
+}
+```
 
 ---
 
-## 📞 Need Help?
-
-- **Discord**: https://discord.com/invite/VQjTVKjs46
-- **GitHub Issues**: https://github.com/mattbaconz/IonAPI/issues
-- **Examples**: See `examples/` folder in the repository
+**Need help?** Join our Discord: https://discord.com/invite/VQjTVKjs46
