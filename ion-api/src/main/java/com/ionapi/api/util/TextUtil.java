@@ -31,7 +31,7 @@ public final class TextUtil {
     /**
      * Creates a colored component from legacy color codes.
      *
-     * @param message the message with color codes (e.g., "&aHello")
+     * @param message the message with color codes (e.g., "&amp;aHello")
      * @return the colored component
      */
     @NotNull

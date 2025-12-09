@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 *   **Build Fix**: Resolved artifact conflict for correct JitPack building.
 *   **API**: Added `IonPlugin#getIonVersion()` utility.
 *   **Documentation**: Updated all guides and verified correctness.
+*   **Polish**: Resolved various Javadoc warnings for cleaner build output.
 
 ---
 

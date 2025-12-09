@@ -9,13 +9,14 @@ import java.util.concurrent.CompletableFuture;
  * Type-safe query builder for database operations.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * List<PlayerData> players = db.select(PlayerData.class)
- *     .where("level", ">", 10)
- *     .and("coins", ">", 1000)
- *     .orderBy("level", "DESC")
- *     .limit(10)
- *     .execute();
+ *         .where("level", ">", 10)
+ *         .and("coins", ">", 1000)
+ *         .orderBy("level", "DESC")
+ *         .limit(10)
+ *         .execute();
  * }</pre>
  *
  * @param <T> the entity type
@@ -25,9 +26,10 @@ public interface QueryBuilder<T> {
     /**
      * Adds a WHERE condition.
      *
-     * @param column the column name
-     * @param operator the comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
-     * @param value the value to compare against
+     * @param column   the column name
+     * @param operator the comparison operator (=, !=, >, &lt;, >=, &lt;=, LIKE,
+     *                 etc.)
+     * @param value    the value to compare against
      * @return this query builder
      */
     @NotNull
@@ -37,7 +39,7 @@ public interface QueryBuilder<T> {
      * Adds a WHERE condition with equals operator.
      *
      * @param column the column name
-     * @param value the value to match
+     * @param value  the value to match
      * @return this query builder
      */
     @NotNull
@@ -46,9 +48,9 @@ public interface QueryBuilder<T> {
     /**
      * Adds an AND condition.
      *
-     * @param column the column name
+     * @param column   the column name
      * @param operator the comparison operator
-     * @param value the value to compare against
+     * @param value    the value to compare against
      * @return this query builder
      */
     @NotNull
@@ -58,7 +60,7 @@ public interface QueryBuilder<T> {
      * Adds an AND condition with equals operator.
      *
      * @param column the column name
-     * @param value the value to match
+     * @param value  the value to match
      * @return this query builder
      */
     @NotNull
@@ -67,9 +69,9 @@ public interface QueryBuilder<T> {
     /**
      * Adds an OR condition.
      *
-     * @param column the column name
+     * @param column   the column name
      * @param operator the comparison operator
-     * @param value the value to compare against
+     * @param value    the value to compare against
      * @return this query builder
      */
     @NotNull
@@ -79,7 +81,7 @@ public interface QueryBuilder<T> {
      * Adds an OR condition with equals operator.
      *
      * @param column the column name
-     * @param value the value to match
+     * @param value  the value to match
      * @return this query builder
      */
     @NotNull
@@ -97,7 +99,7 @@ public interface QueryBuilder<T> {
     /**
      * Adds an ORDER BY clause with direction.
      *
-     * @param column the column to order by
+     * @param column    the column to order by
      * @param direction the direction (ASC or DESC)
      * @return this query builder
      */
