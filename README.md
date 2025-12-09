@@ -165,7 +165,7 @@ ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
 - 🧪 **Unit Testing** - Mock framework (~21 KB)
 - 🔄 **Compatibility Layer** - Java 8+ polyfills (~38 KB)
 
-### 🆕 v1.2.5 Features
+### 🆕 v1.2.6 Features
 - ⏱️ **CooldownManager** - Thread-safe player cooldowns
 - 🚦 **RateLimiter** - Sliding window rate limiting
 - 💬 **MessageBuilder** - Fluent MiniMessage builder with templates
@@ -197,7 +197,7 @@ repositories {
 
 dependencies {
     // IonAPI automatically shades into your plugin!
-    implementation("com.github.mattbaconz:IonAPI:1.2.5")
+    implementation("com.github.mattbaconz:IonAPI:1.2.6")
 }
 
 tasks.shadowJar {
@@ -224,7 +224,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.mattbaconz:IonAPI:1.2.5'
+    implementation 'com.github.mattbaconz:IonAPI:1.2.6'
 }
 
 shadowJar {
@@ -246,7 +246,7 @@ shadowJar {
     <dependency>
         <groupId>com.github.mattbaconz</groupId>
         <artifactId>IonAPI</artifactId>
-        <version>1.2.5</version>
+        <version>1.2.6</version>
     </dependency>
 </dependencies>
 
@@ -306,7 +306,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.2.5")
+    implementation("com.github.mattbaconz:IonAPI:1.2.6")
 }
 
 tasks {
@@ -400,7 +400,7 @@ plugins {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.2.5")
+    implementation("com.github.mattbaconz:IonAPI:1.2.6")
 }
 
 tasks.shadowJar {
