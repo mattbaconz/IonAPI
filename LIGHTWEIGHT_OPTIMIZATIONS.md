@@ -233,4 +233,4 @@ IonAPI v1.2.0 is **ultra-lightweight** through:
 ---
 
 **Version**: 1.2.0  
-**Last Updated**: December 7, 2024
+**Last Updated**: December 7, 2025

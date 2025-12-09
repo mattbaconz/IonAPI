@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.2.0] - 2024-12-07
+## [1.2.0] - 2025-12-07
 
 ### ⚡ Performance
 - **Reflection Caching**: Entity metadata is now cached, providing 10-50x faster ORM operations
@@ -89,7 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0] - 2024-12-06
+## [1.1.0] - 2025-12-06
 
 ### 🔒 Security
 - Fixed SQL injection vulnerability in `QueryBuilderImpl` - all column names, operators, and ORDER BY directions are now sanitized
@@ -137,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] - 2024-12-06
+## [1.0.0] - 2025-12-06
 
 ### ✨ Added
 - **ion-api**: Core plugin API with lifecycle management
@@ -167,9 +167,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Release Date | Key Features | Size |
 |---------|--------------|--------------|------|
-| 1.2.0 | 2024-12-07 | Performance optimizations, 8 new utilities | 273 KB |
-| 1.1.0 | 2024-12-06 | Economy, Redis, ORM relationships, Security fixes | 252 KB |
-| 1.0.0 | 2024-12-06 | Initial release with 13 modules | 230 KB |
+| 1.2.0 | 2025-12-07 | Performance optimizations, 8 new utilities | 273 KB |
+| 1.1.0 | 2025-12-06 | Economy, Redis, ORM relationships, Security fixes | 252 KB |
+| 1.0.0 | 2025-12-06 | Initial release with 13 modules | 230 KB |
 
 ---
 

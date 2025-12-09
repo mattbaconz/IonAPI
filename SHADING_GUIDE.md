@@ -3,7 +3,7 @@
 Complete guide for properly shading IonAPI into your Minecraft plugin to avoid conflicts.
 
 **Version**: 1.2.0  
-**Last Updated**: December 7, 2024
+**Last Updated**: December 7, 2025
 
 ---
 

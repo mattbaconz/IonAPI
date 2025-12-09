@@ -129,6 +129,6 @@ tasks.register<Javadoc>("aggregateJavadoc") {
         windowTitle = "IonAPI v${project.version} API Documentation"
         docTitle = "IonAPI v${project.version}"
         header = "<b>IonAPI v${project.version}</b>"
-        bottom = "Copyright © 2024 mattbaconz. All rights reserved."
+        bottom = "Copyright © 2025 mattbaconz. All rights reserved."
     }
 }
