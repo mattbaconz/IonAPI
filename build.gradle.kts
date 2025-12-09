@@ -20,7 +20,7 @@ tasks.jar {
 
 allprojects {
     group = "com.github.mattbaconz"
-    version = "1.2.5"
+    version = "1.2.6"
 
     repositories {
         mavenCentral()

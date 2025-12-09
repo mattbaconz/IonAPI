@@ -26,6 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.6] - 2024-12-09
+
+### 🚀 Improvements
+*   **Build Fix**: Resolved `publishToMavenLocal` conflict by renaming default jar artifact to `bare` classifier.
+*   **API**: Added `IonPlugin#getIonVersion()` default method to easily check current API version.
+*   **Guide**: Updated documentation for v1.2.6.
+
+---
+
 ## [1.2.0] - 2024-12-07
 
 ### ⚡ Performance

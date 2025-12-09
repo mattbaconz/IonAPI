@@ -83,4 +83,14 @@ public interface IonPlugin {
      */
     @NotNull
     String getPlatform();
+
+    /**
+     * Gets the current IonAPI version.
+     *
+     * @return the version string
+     */
+    @NotNull
+    default String getIonVersion() {
+        return "1.2.6";
+    }
 }
