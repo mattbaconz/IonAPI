@@ -282,16 +282,18 @@ public void openShop(Player player) {
 
 ### Dynamic Scoreboard
 ```java
-IonScoreboard board = IonScoreboard.create(player)
+IonScoreboard board = IonScoreboard.builder()
     .title("<gold>Server")
-    .line("")
-    .line("")
-    .line("")
-    .dynamicLine(0, p -> "§ePlayers: §f" + Bukkit.getOnlinePlayers().size())
-    .dynamicLine(1, p -> "§aCoins: §f" + getCoins(p))
-    .dynamicLine(2, p -> "§bLevel: §f" + getLevel(p))
-    .autoUpdate(20L)
-    .show();
+    .line(15, "<yellow>Players: {players}")
+    .line(14, "<green>Coins: {coins}")
+    .line(13, "<aqua>Level: {level}")
+    .placeholder("players", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+    .placeholder("coins", p -> String.valueOf(getCoins(p)))
+    .placeholder("level", p -> String.valueOf(getLevel(p)))
+    .updateInterval(20)
+    .build();
+
+board.show(player);
 ```
 
 ### Progress BossBar
@@ -428,10 +430,10 @@ dependencies {
     implementation("com.github.mattbaconz:IonAPI:1.3.0")
     
     // OR individual modules:
-    // compileOnly("com.ionapi:ion-api:1.2.6")
-    // implementation("com.ionapi:ion-database:1.2.6")
-    // implementation("com.ionapi:ion-economy:1.2.6")
-    // implementation("com.ionapi:ion-gui:1.2.6")
+    // compileOnly("com.ionapi:ion-api:1.3.0")
+    // implementation("com.ionapi:ion-database:1.3.0")
+    // implementation("com.ionapi:ion-economy:1.3.0")
+    // implementation("com.ionapi:ion-gui:1.3.0")
 }
 ```
 

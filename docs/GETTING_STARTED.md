@@ -28,9 +28,9 @@ dependencies {
     implementation("com.github.mattbaconz:IonAPI:1.3.0")
     
     // OR individual modules:
-    // implementation("com.ionapi:ion-api:1.2.6")
-    // implementation("com.ionapi:ion-database:1.2.6")
-    // implementation("com.ionapi:ion-economy:1.2.6")
+    // implementation("com.ionapi:ion-api:1.3.0")
+    // implementation("com.ionapi:ion-database:1.3.0")
+    // implementation("com.ionapi:ion-economy:1.3.0")
 }
 ```
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.mattbaconz:IonAPI:1.2.6'
+    implementation 'com.github.mattbaconz:IonAPI:1.3.0'
 }
 ```
 
@@ -506,26 +506,27 @@ Create dynamic scoreboards with auto-updating content.
 import com.ionapi.ui.IonScoreboard;
 
 public void showStatsBoard(Player player) {
-    IonScoreboard board = IonScoreboard.create(player)
+    IonScoreboard board = IonScoreboard.builder()
         .title("<gold><bold>Your Stats")
-        .line("<gray>━━━━━━━━━━━━━━")
-        .line("")  // Placeholder for dynamic line
-        .line("")  // Placeholder for dynamic line
-        .line("")  // Placeholder for dynamic line
-        .line("<gray>━━━━━━━━━━━━━━")
-        .dynamicLine(1, p -> "<yellow>Online: <white>" + Bukkit.getOnlinePlayers().size())
-        .dynamicLine(2, p -> "<green>Health: <white>" + (int) p.getHealth() + "/20")
-        .dynamicLine(3, p -> "<aqua>Level: <white>" + p.getLevel())
-        .autoUpdate(20L)  // Update every second
-        .show();
+        .line(15, "<gray>━━━━━━━━━━━━━━")
+        .line(14, "<yellow>Online: <white>{online}")
+        .line(13, "<green>Health: <white>{health}")
+        .line(12, "<aqua>Level: <white>{level}")
+        .line(11, "<gray>━━━━━━━━━━━━━━")
+        .placeholder("online", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+        .placeholder("health", p -> String.valueOf((int) p.getHealth()) + "/20")
+        .placeholder("level", p -> String.valueOf(p.getLevel()))
+        .updateInterval(20) // Update every second
+        .build();
     
+    board.show(player);
     // Store for cleanup later
     scoreboards.put(player.getUniqueId(), board);
 }
 
-// Update manually
-board.updateLine(1, "<yellow>New text");
-board.update();
+// Update single line manually
+board.setLine(player, 14, "<yellow>New text");
+board.update(player);
 
 // Cleanup
 @Override
@@ -690,19 +691,20 @@ private void purchaseItem(Player player, Material item, int cost) {
 private final Map<UUID, IonScoreboard> scoreboards = new HashMap<>();
 
 public void showStatsBoard(Player player) {
-    IonScoreboard board = IonScoreboard.create(player)
+    IonScoreboard board = IonScoreboard.builder()
         .title("<gold><bold>Your Stats")
-        .line("<gray>━━━━━━━━━━━━━━")
-        .line("")
-        .line("")
-        .line("")
-        .line("<gray>━━━━━━━━━━━━━━")
-        .dynamicLine(1, p -> "<yellow>Level: <white>" + getLevel(p))
-        .dynamicLine(2, p -> "<green>Coins: <white>" + getCoins(p))
-        .dynamicLine(3, p -> "<aqua>Rank: <white>" + getRank(p))
-        .autoUpdate(20L)
-        .show();
+        .line(15, "<gray>━━━━━━━━━━━━━━")
+        .line(14, "<yellow>Level: <white>{level}")
+        .line(13, "<green>Coins: <white>{coins}")
+        .line(12, "<aqua>Rank: <white>{rank}")
+        .line(11, "<gray>━━━━━━━━━━━━━━")
+        .placeholder("level", p -> String.valueOf(getLevel(p)))
+        .placeholder("coins", p -> String.valueOf(getCoins(p)))
+        .placeholder("rank", p -> getRank(p))
+        .updateInterval(20)
+        .build();
     
+    board.show(player);
     scoreboards.put(player.getUniqueId(), board);
 }
 
@@ -792,15 +794,21 @@ getScheduler().run(() -> {
 ```java
 // ✅ GOOD - Cache and reuse
 Map<UUID, IonScoreboard> boards = new HashMap<>();
+IonScoreboard template = IonScoreboard.builder()
+    .title("<gold>Server")
+    .line(15, "Cached content")
+    .build();
 
-public IonScoreboard getBoard(Player player) {
-    return boards.computeIfAbsent(player.getUniqueId(), 
-        uuid -> IonScoreboard.create(player).show());
+public void showBoard(Player player) {
+    if (!boards.containsKey(player.getUniqueId())) {
+        template.show(player);
+        boards.put(player.getUniqueId(), template);
+    }
 }
 
 // ❌ BAD - Create new every time
 public void updateBoard(Player player) {
-    IonScoreboard.create(player).show();  // Memory leak!
+    IonScoreboard.builder().title("New").build().show(player);  // Memory leak!
 }
 ```
 

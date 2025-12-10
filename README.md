@@ -232,7 +232,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.mattbaconz:IonAPI:1.2.6'
+    implementation 'com.github.mattbaconz:IonAPI:1.3.0'
 }
 
 shadowJar {

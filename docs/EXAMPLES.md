@@ -129,7 +129,6 @@ IonScoreboard.builder()
     .build()
     .show(player);
 ```
-```
 
 ---
 
@@ -249,13 +248,14 @@ public class MyPlugin implements IonPlugin {
             Player player = event.getPlayer();
             
             // Show scoreboard
-            IonScoreboard board = IonScoreboard.create(player)
+            IonScoreboard board = IonScoreboard.builder()
                 .title("<gold>Welcome!")
-                .line("")
-                .dynamicLine(0, p -> "<yellow>Players: " + Bukkit.getOnlinePlayers().size())
-                .autoUpdate(20L)
-                .show();
+                .line(15, "<yellow>Players: {players}")
+                .placeholder("players", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+                .updateInterval(20)
+                .build();
             
+            board.show(player);
             scoreboards.put(player.getUniqueId(), board);
         }
     }
