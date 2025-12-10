@@ -57,7 +57,6 @@ public class IonGuiBuilder implements IonGui {
     private GuiSound closeSound;
     private GuiSound clickSound;
 
-
     public IonGuiBuilder() {
         this.title = Component.text("Inventory");
         this.rows = 3;
@@ -74,21 +73,24 @@ public class IonGuiBuilder implements IonGui {
     @NotNull
     public IonGuiBuilder title(@NotNull String title) {
         this.title = MINI_MESSAGE.deserialize(title);
-        if (built) rebuildInventory();
+        if (built)
+            rebuildInventory();
         return this;
     }
 
     @NotNull
     public IonGuiBuilder title(@NotNull Component title) {
         this.title = title;
-        if (built) rebuildInventory();
+        if (built)
+            rebuildInventory();
         return this;
     }
 
     @NotNull
     public IonGuiBuilder rows(int rows) {
         this.rows = Math.max(1, Math.min(6, rows));
-        if (built) rebuildInventory();
+        if (built)
+            rebuildInventory();
         return this;
     }
 
@@ -103,7 +105,8 @@ public class IonGuiBuilder implements IonGui {
     public IonGuiBuilder item(int slot, @Nullable ItemStack item, @Nullable Consumer<GuiClickEvent> clickHandler) {
         ensureBuilt();
         inventory.setItem(slot, item);
-        if (clickHandler != null) clickHandlers.put(slot, clickHandler);
+        if (clickHandler != null)
+            clickHandlers.put(slot, clickHandler);
         return this;
     }
 
@@ -113,7 +116,8 @@ public class IonGuiBuilder implements IonGui {
     }
 
     @NotNull
-    public IonGuiBuilder item(int row, int col, @Nullable ItemStack item, @Nullable Consumer<GuiClickEvent> clickHandler) {
+    public IonGuiBuilder item(int row, int col, @Nullable ItemStack item,
+            @Nullable Consumer<GuiClickEvent> clickHandler) {
         return item(row * 9 + col, item, clickHandler);
     }
 
@@ -198,9 +202,11 @@ public class IonGuiBuilder implements IonGui {
     }
 
     @NotNull
-    public IonGuiBuilder animatedItem(int slot, @NotNull AnimatedItem animatedItem, @Nullable Consumer<GuiClickEvent> clickHandler) {
+    public IonGuiBuilder animatedItem(int slot, @NotNull AnimatedItem animatedItem,
+            @Nullable Consumer<GuiClickEvent> clickHandler) {
         animatedItem(slot, animatedItem);
-        if (clickHandler != null) clickHandlers.put(slot, clickHandler);
+        if (clickHandler != null)
+            clickHandlers.put(slot, clickHandler);
         return this;
     }
 
@@ -262,30 +268,33 @@ public class IonGuiBuilder implements IonGui {
         return this;
     }
 
-
     // ==================== IonGui Implementation ====================
 
     @Override
     public void open(@NotNull Player player) {
         ensureBuilt();
         GuiOpenEvent event = new GuiOpenEvent(this, player);
-        if (openHandler != null) openHandler.accept(event);
+        if (openHandler != null)
+            openHandler.accept(event);
         if (!event.isCancelled()) {
             player.openInventory(inventory);
-            if (openSound != null) openSound.play(player);
+            if (openSound != null)
+                openSound.play(player);
         }
     }
 
     @Override
     public void close(@NotNull Player player) {
-        if (closeSound != null) closeSound.play(player);
+        if (closeSound != null)
+            closeSound.play(player);
         player.closeInventory();
     }
 
     @Override
     public void closeAll() {
         inventory.getViewers().forEach(viewer -> {
-            if (viewer instanceof Player p && closeSound != null) closeSound.play(p);
+            if (viewer instanceof Player p && closeSound != null)
+                closeSound.play(p);
             viewer.closeInventory();
         });
     }
@@ -297,7 +306,8 @@ public class IonGuiBuilder implements IonGui {
             inventory.setItem(entry.getKey(), entry.getValue().getCurrentFrame());
         }
         inventory.getViewers().forEach(viewer -> {
-            if (viewer instanceof Player player) player.updateInventory();
+            if (viewer instanceof Player player)
+                player.updateInventory();
         });
     }
 
@@ -310,8 +320,10 @@ public class IonGuiBuilder implements IonGui {
     @Override
     public void setItem(int slot, @Nullable ItemStack item, @Nullable Consumer<GuiClickEvent> clickHandler) {
         setItem(slot, item);
-        if (clickHandler != null) clickHandlers.put(slot, clickHandler);
-        else clickHandlers.remove(slot);
+        if (clickHandler != null)
+            clickHandlers.put(slot, clickHandler);
+        else
+            clickHandlers.remove(slot);
     }
 
     @Override
@@ -346,22 +358,34 @@ public class IonGuiBuilder implements IonGui {
     }
 
     @Override
-    public void fill(@Nullable ItemStack item) { fillBuilder(item); }
+    public void fill(@Nullable ItemStack item) {
+        fillBuilder(item);
+    }
 
     @Override
-    public void fillBorder(@Nullable ItemStack item) { fillBorderBuilder(item); }
+    public void fillBorder(@Nullable ItemStack item) {
+        fillBorderBuilder(item);
+    }
 
     @Override
-    public void fillRect(int startSlot, int endSlot, @Nullable ItemStack item) { fillRectBuilder(startSlot, endSlot, item); }
+    public void fillRect(int startSlot, int endSlot, @Nullable ItemStack item) {
+        fillRectBuilder(startSlot, endSlot, item);
+    }
 
     @Override
-    public @NotNull Component getTitle() { return title; }
+    public @NotNull Component getTitle() {
+        return title;
+    }
 
     @Override
-    public int getRows() { return rows; }
+    public int getRows() {
+        return rows;
+    }
 
     @Override
-    public int getSize() { return rows * 9; }
+    public int getSize() {
+        return rows * 9;
+    }
 
     @Override
     public @NotNull Inventory getInventory() {
@@ -370,47 +394,72 @@ public class IonGuiBuilder implements IonGui {
     }
 
     @Override
-    public boolean isOpen() { return inventory != null && !inventory.getViewers().isEmpty(); }
+    public boolean isOpen() {
+        return inventory != null && !inventory.getViewers().isEmpty();
+    }
 
     @Override
-    public int getViewerCount() { return inventory == null ? 0 : inventory.getViewers().size(); }
+    public int getViewerCount() {
+        return inventory == null ? 0 : inventory.getViewers().size();
+    }
 
     @Override
-    public void onOpen(@Nullable Consumer<GuiOpenEvent> handler) { this.openHandler = handler; }
+    public void onOpen(@Nullable Consumer<GuiOpenEvent> handler) {
+        this.openHandler = handler;
+    }
 
     @Override
-    public void onClose(@Nullable Consumer<GuiCloseEvent> handler) { this.closeHandler = handler; }
+    public void onClose(@Nullable Consumer<GuiCloseEvent> handler) {
+        this.closeHandler = handler;
+    }
 
     @Override
-    public void onClick(@Nullable Consumer<GuiClickEvent> handler) { this.globalClickHandler = handler; }
+    public void onClick(@Nullable Consumer<GuiClickEvent> handler) {
+        this.globalClickHandler = handler;
+    }
 
     @Override
-    public void onDrag(@Nullable Consumer<GuiDragEvent> handler) { this.dragHandler = handler; }
+    public void onDrag(@Nullable Consumer<GuiDragEvent> handler) {
+        this.dragHandler = handler;
+    }
 
     @Override
-    public void setAllowTake(boolean allowTake) { this.allowTake = allowTake; }
+    public void setAllowTake(boolean allowTake) {
+        this.allowTake = allowTake;
+    }
 
     @Override
-    public void setAllowPlace(boolean allowPlace) { this.allowPlace = allowPlace; }
+    public void setAllowPlace(boolean allowPlace) {
+        this.allowPlace = allowPlace;
+    }
 
     @Override
-    public void setAllowDrag(boolean allowDrag) { this.allowDrag = allowDrag; }
+    public void setAllowDrag(boolean allowDrag) {
+        this.allowDrag = allowDrag;
+    }
 
     @Override
     public void setAutoUpdate(boolean autoUpdate, long intervalTicks) {
         this.autoUpdate = autoUpdate;
         this.updateInterval = intervalTicks;
-        if (autoUpdate && built) startAutoUpdate();
+        if (autoUpdate && built)
+            startAutoUpdate();
     }
 
     @Override
-    public void setOpenSound(@Nullable GuiSound sound) { this.openSound = sound; }
+    public void setOpenSound(@Nullable GuiSound sound) {
+        this.openSound = sound;
+    }
 
     @Override
-    public void setCloseSound(@Nullable GuiSound sound) { this.closeSound = sound; }
+    public void setCloseSound(@Nullable GuiSound sound) {
+        this.closeSound = sound;
+    }
 
     @Override
-    public void setClickSound(@Nullable GuiSound sound) { this.clickSound = sound; }
+    public void setClickSound(@Nullable GuiSound sound) {
+        this.clickSound = sound;
+    }
 
     @Override
     public void setAnimatedItem(int slot, @NotNull AnimatedItem animatedItem) {
@@ -420,9 +469,11 @@ public class IonGuiBuilder implements IonGui {
     }
 
     @Override
-    public void setAnimatedItem(int slot, @NotNull AnimatedItem animatedItem, @Nullable Consumer<GuiClickEvent> clickHandler) {
+    public void setAnimatedItem(int slot, @NotNull AnimatedItem animatedItem,
+            @Nullable Consumer<GuiClickEvent> clickHandler) {
         setAnimatedItem(slot, animatedItem);
-        if (clickHandler != null) clickHandlers.put(slot, clickHandler);
+        if (clickHandler != null)
+            clickHandlers.put(slot, clickHandler);
     }
 
     @Override
@@ -454,7 +505,6 @@ public class IonGuiBuilder implements IonGui {
         dragHandler = null;
     }
 
-
     // ==================== Private Helper Methods ====================
 
     private void ensureBuilt() {
@@ -465,7 +515,8 @@ public class IonGuiBuilder implements IonGui {
     }
 
     private void rebuildInventory() {
-        if (inventory == null) return;
+        if (inventory == null)
+            return;
         ItemStack[] contents = inventory.getContents();
         inventory = Bukkit.createInventory(new GuiHolder(this), rows * 9, title);
         int copySize = Math.min(contents.length, inventory.getSize());
@@ -492,7 +543,8 @@ public class IonGuiBuilder implements IonGui {
                         needsUpdate = true;
                     }
                 }
-                if (needsUpdate) update();
+                if (needsUpdate)
+                    update();
             }, 1L, 1L);
         }
     }
@@ -504,52 +556,57 @@ public class IonGuiBuilder implements IonGui {
     }
 
     private void handleClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!(event.getWhoClicked() instanceof Player player))
+            return;
+
+        // Cancel ALL events by default - GUI is view-only unless explicitly allowed
+        // This prevents all forms of item manipulation including shift-click dupes
+        event.setCancelled(true);
+
         int slot = event.getRawSlot();
 
-        // Clicking in player's own inventory (bottom inventory)
+        // Clicking outside or in player's own inventory (bottom inventory)
         if (slot < 0 || slot >= inventory.getSize()) {
-            // Always cancel to prevent shift-click duping exploits
-            event.setCancelled(true);
             return;
         }
 
         GuiClickEvent clickEvent = new GuiClickEvent(
-            this, player, slot, event.getClick(), event.getAction(),
-            event.getCurrentItem(), event.getCursor()
-        );
+                this, player, slot, event.getClick(), event.getAction(),
+                event.getCurrentItem(), event.getCursor());
 
         // Play click sound
-        if (clickSound != null) clickSound.play(player);
+        if (clickSound != null)
+            clickSound.play(player);
 
         // Call handlers
-        if (globalClickHandler != null) globalClickHandler.accept(clickEvent);
+        if (globalClickHandler != null)
+            globalClickHandler.accept(clickEvent);
         Consumer<GuiClickEvent> handler = clickHandlers.get(slot);
-        if (handler != null) handler.accept(clickEvent);
+        if (handler != null)
+            handler.accept(clickEvent);
 
-        // Cancel event based on permissions and handlers
-        if (clickEvent.isCancelled()) {
-            event.setCancelled(true);
-        } else {
-            // Prevent item manipulation unless explicitly allowed
+        // Only allow interaction if BOTH the event wasn't cancelled by handler
+        // AND the GUI explicitly allows take/place
+        if (!clickEvent.isCancelled() && (allowTake || allowPlace)) {
+            // Re-enable the event for allowed operations
             boolean isShiftClick = event.isShiftClick();
             boolean isNumberKey = event.getHotbarButton() >= 0;
-            
-            // Always cancel shift-click and number key presses to prevent duping
-            if (isShiftClick || isNumberKey) {
-                event.setCancelled(true);
-            } else if (!allowTake && !allowPlace) {
-                event.setCancelled(true);
+
+            // Still block shift-click and number keys as they can cause issues
+            if (!isShiftClick && !isNumberKey) {
+                event.setCancelled(false);
             }
         }
     }
 
     private void handleDrag(InventoryDragEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!(event.getWhoClicked() instanceof Player player))
+            return;
 
         // Check if any slots are in our GUI
         boolean affectsGui = event.getRawSlots().stream().anyMatch(slot -> slot < inventory.getSize());
-        if (!affectsGui) return;
+        if (!affectsGui)
+            return;
 
         if (!allowDrag) {
             event.setCancelled(true);
@@ -558,11 +615,11 @@ public class IonGuiBuilder implements IonGui {
 
         if (dragHandler != null) {
             GuiDragEvent dragEvent = new GuiDragEvent(
-                this, player, event.getType(), event.getNewItems(),
-                event.getRawSlots(), event.getOldCursor(), event.getCursor()
-            );
+                    this, player, event.getType(), event.getNewItems(),
+                    event.getRawSlots(), event.getOldCursor(), event.getCursor());
             dragHandler.accept(dragEvent);
-            if (dragEvent.isCancelled()) event.setCancelled(true);
+            if (dragEvent.isCancelled())
+                event.setCancelled(true);
         }
     }
 
@@ -570,13 +627,15 @@ public class IonGuiBuilder implements IonGui {
         if (openHandler != null && event.getPlayer() instanceof Player player) {
             GuiOpenEvent openEvent = new GuiOpenEvent(this, player);
             openHandler.accept(openEvent);
-            if (openEvent.isCancelled()) event.setCancelled(true);
+            if (openEvent.isCancelled())
+                event.setCancelled(true);
         }
     }
 
     private void handleClose(InventoryCloseEvent event) {
         if (event.getPlayer() instanceof Player player) {
-            if (closeSound != null) closeSound.play(player);
+            if (closeSound != null)
+                closeSound.play(player);
             if (closeHandler != null) {
                 GuiCloseEvent closeEvent = new GuiCloseEvent(this, player, GuiCloseEvent.CloseReason.PLAYER);
                 closeHandler.accept(closeEvent);
@@ -625,9 +684,11 @@ public class IonGuiBuilder implements IonGui {
         @EventHandler(priority = EventPriority.NORMAL)
         public void onPlayerQuit(PlayerQuitEvent event) {
             Player player = event.getPlayer();
-            if (player.getOpenInventory().getTopInventory().getHolder() instanceof GuiHolder holder && holder.gui() == IonGuiBuilder.this) {
+            if (player.getOpenInventory().getTopInventory().getHolder() instanceof GuiHolder holder
+                    && holder.gui() == IonGuiBuilder.this) {
                 if (closeHandler != null) {
-                    closeHandler.accept(new GuiCloseEvent(IonGuiBuilder.this, player, GuiCloseEvent.CloseReason.DISCONNECT));
+                    closeHandler.accept(
+                            new GuiCloseEvent(IonGuiBuilder.this, player, GuiCloseEvent.CloseReason.DISCONNECT));
                 }
             }
         }

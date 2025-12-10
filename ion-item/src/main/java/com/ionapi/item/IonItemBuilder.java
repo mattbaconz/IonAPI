@@ -40,7 +40,7 @@ public class IonItemBuilder implements IonItem.Builder {
      * Creates a new item builder for the specified material with amount.
      *
      * @param material the material type
-     * @param amount the stack size
+     * @param amount   the stack size
      */
     public IonItemBuilder(@NotNull Material material, int amount) {
         this.itemStack = new ItemStack(material, amount);
@@ -253,6 +253,73 @@ public class IonItemBuilder implements IonItem.Builder {
         // Apply meta first, then allow custom modifications
         itemStack.setItemMeta(itemMeta);
         modifier.accept(itemStack);
+        return this;
+    }
+
+    @Override
+    public @NotNull IonItem.Builder skullTexture(@NotNull String base64Texture) {
+        if (itemMeta instanceof org.bukkit.inventory.meta.SkullMeta skullMeta) {
+            try {
+                java.util.UUID uuid = java.util.UUID.randomUUID();
+                org.bukkit.profile.PlayerProfile profile = org.bukkit.Bukkit.createPlayerProfile(uuid);
+                org.bukkit.profile.PlayerTextures textures = profile.getTextures();
+
+                // Decode base64 to get the URL
+                String decoded = new String(java.util.Base64.getDecoder().decode(base64Texture));
+                // Extract URL from JSON
+                String url = decoded.replaceAll(".*\"url\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+                if (url.startsWith("http")) {
+                    textures.setSkin(java.net.URI.create(url).toURL());
+                    profile.setTextures(textures);
+                    skullMeta.setOwnerProfile(profile);
+                }
+            } catch (Exception e) {
+                // Silently fail if texture parsing fails
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public @NotNull IonItem.Builder color(@NotNull org.bukkit.Color color) {
+        if (itemMeta instanceof org.bukkit.inventory.meta.LeatherArmorMeta leatherMeta) {
+            leatherMeta.setColor(color);
+        }
+        return this;
+    }
+
+    @Override
+    public @NotNull IonItem.Builder color(int red, int green, int blue) {
+        return color(org.bukkit.Color.fromRGB(red, green, blue));
+    }
+
+    @Override
+    public @NotNull IonItem.Builder potionEffect(@NotNull org.bukkit.potion.PotionEffect effect) {
+        if (itemMeta instanceof org.bukkit.inventory.meta.PotionMeta potionMeta) {
+            potionMeta.addCustomEffect(effect, true);
+        }
+        return this;
+    }
+
+    @Override
+    public @NotNull IonItem.Builder potionEffect(@NotNull org.bukkit.potion.PotionEffectType type, int durationTicks,
+            int amplifier) {
+        return potionEffect(new org.bukkit.potion.PotionEffect(type, durationTicks, amplifier));
+    }
+
+    @Override
+    public @NotNull IonItem.Builder potionType(@NotNull org.bukkit.potion.PotionType type) {
+        if (itemMeta instanceof org.bukkit.inventory.meta.PotionMeta potionMeta) {
+            potionMeta.setBasePotionType(type);
+        }
+        return this;
+    }
+
+    @Override
+    public @NotNull IonItem.Builder potionColor(@NotNull org.bukkit.Color color) {
+        if (itemMeta instanceof org.bukkit.inventory.meta.PotionMeta potionMeta) {
+            potionMeta.setColor(color);
+        }
         return this;
     }
 

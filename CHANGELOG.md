@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2025-12-10
+
+### 🐛 Bug Fixes
+*   **Scoreboard Flashing Fixed**: Completely rewrote `IonScoreboard` to use per-line Team prefix updates instead of clearing all entries. Scoreboards now update smoothly without any visible flashing.
+*   **GUI Item Duplication Fixed**: Fixed potential item duplication exploit in `IonGuiBuilder` by canceling ALL inventory events by default.
+
+### ✨ New Features
+
+#### ion-ui (Scoreboard)
+*   **Per-Line Updates**: Only lines that actually change are updated, eliminating flashing.
+*   **Line Caching**: Efficient caching system tracks previous content to minimize updates.
+*   **Animated Lines**: New `animatedLine(score, intervalTicks, frames...)` for cycling text animations.
+*   **Auto-Update Scheduling**: Built-in `updateInterval(ticks)` for automatic scoreboard refreshing.
+
+#### ion-gui
+*   **ConfirmationGui**: New dialog class for simple yes/no confirmations with customizable styling.
+    ```java
+    ConfirmationGui.create()
+        .title("<red>⚠ Confirm")
+        .message("Delete all data?")
+        .onConfirm(player -> deleteData())
+        .danger() // Red styling for destructive actions
+        .open(player);
+    ```
+
+#### ion-item
+*   **Skull Textures**: Set custom player head textures using base64 encoded data.
+    ```java
+    IonItem.builder(Material.PLAYER_HEAD)
+        .skullTexture("eyJ0ZXh0dXJlcyI6...")
+        .build();
+    ```
+*   **Leather Armor Colors**: Color leather armor pieces.
+    ```java
+    IonItem.builder(Material.LEATHER_CHESTPLATE)
+        .color(Color.RED)
+        .build();
+    ```
+*   **Potion Effects**: Add potion effects and customize potion items.
+    ```java
+    IonItem.builder(Material.POTION)
+        .potionType(PotionType.STRENGTH)
+        .potionEffect(PotionEffectType.SPEED, 200, 1)
+        .potionColor(Color.PURPLE)
+        .build();
+    ```
+
+### 📚 API Changes
+*   `IonItem.Builder`: Added `skullTexture()`, `color()`, `potionEffect()`, `potionType()`, `potionColor()` methods
+*   `IonScoreboard.Builder`: Added `animatedLine()`, `updateInterval()` methods
+*   `IonScoreboard`: Added `removeLine()` method for dynamic line management
+
+---
+
 ## [1.2.5] - 2025-12-09
 
 ### 🚀 Platform Support

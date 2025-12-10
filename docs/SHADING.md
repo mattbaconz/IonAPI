@@ -2,8 +2,8 @@
 
 Complete guide for properly shading IonAPI into your Minecraft plugin to avoid conflicts.
 
-**Version**: 1.2.6  
-**Last Updated**: December 7, 2025
+**Version**: 1.3.0  
+**Last Updated**: December 10, 2025
 
 ---
 
@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.2.0")
+    implementation("com.github.mattbaconz:IonAPI:1.3.0")
 }
 
 java {
@@ -97,7 +97,7 @@ repositories {
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
-    implementation 'com.github.mattbaconz:IonAPI:1.2.0'
+    implementation 'com.github.mattbaconz:IonAPI:1.3.0'
 }
 
 shadowJar {
@@ -163,7 +163,7 @@ java {
         <dependency>
             <groupId>com.github.mattbaconz</groupId>
             <artifactId>IonAPI</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
     </dependencies>
 
@@ -402,7 +402,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.2.0")
+    implementation("com.github.mattbaconz:IonAPI:1.3.0")
 }
 
 java {

@@ -4,28 +4,96 @@ How to upgrade between IonAPI versions.
 
 ---
 
-## Current Version: 1.2.6
+## Current Version: 1.3.0
 
 ---
 
-## Upgrading to v1.2.6 from v1.2.5
+## Upgrading to v1.3.0 from v1.2.x
 
 ### What's New
-- Minor bug fixes and stability improvements
-- Documentation updates
+- 📊 **Scoreboard Flashing Fixed** - Complete rewrite with per-line updates
+- ✨ **Animated Scoreboard Lines** - Text cycling animations
+- 📦 **ConfirmationGui** - Simple yes/no dialog class
+- 💀 **Skull Textures** - Base64 texture support for player heads
+- 🎨 **Leather Armor Colors** - Color support for leather items
+- 🧪 **Potion Effects** - Fluent potion builder methods
+- 🔒 **GUI Security** - Fixed item duplication exploits
 
 ### Breaking Changes
-None - this is a patch release.
+
+#### 1. IonScoreboard API Changes
+
+The `IonScoreboard` has been completely rewritten for better performance:
+
+```java
+// Old (v1.2.x) - create() static method
+IonScoreboard board = IonScoreboard.create(player)
+    .title("Title")
+    .show();
+
+// New (v1.3.0) - builder() pattern
+IonScoreboard board = IonScoreboard.builder()
+    .title("Title")
+    .line(15, "Line text")
+    .placeholder("key", p -> "value")
+    .updateInterval(20) // NEW: Auto-update
+    .build();
+
+board.show(player);
+```
+
+#### 2. New Features You Can Use
+
+**Animated Scoreboard Lines:**
+```java
+IonScoreboard.builder()
+    .title("<gold>Server")
+    .animatedLine(15, 10, "Frame 1", "Frame 2", "Frame 3") // Cycles every 10 ticks
+    .build();
+```
+
+**ConfirmationGui:**
+```java
+ConfirmationGui.create()
+    .title("<red>⚠ Confirm")
+    .message("Delete all data?")
+    .onConfirm(player -> deleteData())
+    .danger() // Red styling
+    .open(player);
+```
+
+**Item Builder Enhancements:**
+```java
+// Skull textures
+IonItem.builder(Material.PLAYER_HEAD)
+    .skullTexture("eyJ0ZXh0dXJlcyI6Li4u")
+    .build();
+
+// Leather colors
+IonItem.builder(Material.LEATHER_CHESTPLATE)
+    .color(Color.RED)
+    .build();
+
+// Potion effects
+IonItem.builder(Material.POTION)
+    .potionType(PotionType.STRENGTH)
+    .potionEffect(PotionEffectType.SPEED, 200, 1)
+    .potionColor(Color.PURPLE)
+    .build();
+```
 
 ### Steps
 1. Update dependency version:
 ```kotlin
-implementation("com.github.mattbaconz:IonAPI:1.2.6")
+implementation("com.github.mattbaconz:IonAPI:1.3.0")
 ```
-2. Rebuild: `./gradlew clean shadowJar`
-3. Replace JAR on server
+2. If using `IonScoreboard.create()`, migrate to builder pattern
+3. Rebuild: `./gradlew clean shadowJar`
+4. Replace JAR on server
 
 ---
+
+## Upgrading to v1.2.6 from v1.2.5
 
 ## Upgrading to v1.2.5 from v1.2.0
 
@@ -197,6 +265,7 @@ When upgrading any version:
 
 | IonAPI | Java | Paper | Folia | Vault |
 |--------|------|-------|-------|-------|
+| 1.3.0  | 17+  | 1.19+ | ✅    | 1.7+  |
 | 1.2.6  | 17+  | 1.19+ | ✅    | 1.7+  |
 | 1.2.5  | 17+  | 1.19+ | ✅    | 1.7+  |
 | 1.2.0  | 17+  | 1.19+ | ✅    | 1.7+  |

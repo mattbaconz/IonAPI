@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     // All-in-one (recommended)
-    implementation("com.github.mattbaconz:IonAPI:1.2.6")
+    implementation("com.github.mattbaconz:IonAPI:1.3.0")
     
     // OR individual modules:
     // implementation("com.ionapi:ion-api:1.2.6")
@@ -52,7 +52,7 @@ dependencies {
     <dependency>
         <groupId>com.github.mattbaconz</groupId>
         <artifactId>IonAPI</artifactId>
-        <version>1.2.6</version>
+        <version>1.3.0</version>
     </dependency>
 </dependencies>
 ```
