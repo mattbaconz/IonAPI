@@ -1,6 +1,6 @@
 # 💡 IonAPI Examples
 
-Quick, practical examples to get you started fast.
+**Version**: 1.3.0 | Quick, practical examples to get you started fast.
 
 ---
 
@@ -87,26 +87,27 @@ public void openProfile(Player player) {
 
 ---
 
-## 📊 Scoreboard
+## 📊 Scoreboard (v1.3.0 - No Flashing!)
 
 ### Dynamic Stats
 ```java
 private final Map<UUID, IonScoreboard> scoreboards = new HashMap<>();
 
 public void showStatsBoard(Player player) {
-    IonScoreboard board = IonScoreboard.create(player)
+    IonScoreboard board = IonScoreboard.builder()
         .title("<gold><bold>⚡ Your Stats")
-        .line("<gray>━━━━━━━━━━━━━━")
-        .line("")
-        .line("")
-        .line("")
-        .line("<gray>━━━━━━━━━━━━━━")
-        .dynamicLine(1, p -> "<yellow>Level: <white>" + getLevel(p))
-        .dynamicLine(2, p -> "<green>Coins: <white>" + getCoins(p))
-        .dynamicLine(3, p -> "<aqua>Rank: <white>" + getRank(p))
-        .autoUpdate(20L)
-        .show();
+        .line(15, "<gray>━━━━━━━━━━━━━━")
+        .line(14, "<yellow>Level: <white>{level}")
+        .line(13, "<green>Coins: <white>{coins}")
+        .line(12, "<aqua>Rank: <white>{rank}")
+        .line(11, "<gray>━━━━━━━━━━━━━━")
+        .placeholder("level", p -> String.valueOf(getLevel(p)))
+        .placeholder("coins", p -> String.valueOf(getCoins(p)))
+        .placeholder("rank", p -> getRank(p))
+        .updateInterval(20) // Auto-update every second
+        .build();
     
+    board.show(player);
     scoreboards.put(player.getUniqueId(), board);
 }
 
@@ -114,6 +115,20 @@ public void showStatsBoard(Player player) {
 public void onDisable() {
     scoreboards.values().forEach(IonScoreboard::destroy);
 }
+```
+
+### Animated Scoreboard
+```java
+IonScoreboard.builder()
+    .title("<gradient:gold:yellow>My Server")
+    .animatedLine(15, 10, "✦ Welcome ✦", "★ Welcome ★", "✧ Welcome ✧")
+    .line(14, "")
+    .line(13, "<yellow>Players: <white>{online}")
+    .placeholder("online", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+    .updateInterval(20)
+    .build()
+    .show(player);
+```
 ```
 
 ---
@@ -299,7 +314,65 @@ For more detailed examples, see:
 
 ---
 
-## 🆕 v1.2.6 Features
+## 🆕 v1.3.0 Features
+
+### ConfirmationGui
+
+```java
+// Simple confirmation
+ConfirmationGui.create()
+    .title("<red>⚠ Confirm")
+    .message("Delete all data?")
+    .onConfirm(player -> {
+        deleteData();
+        player.sendMessage("<green>Deleted!");
+    })
+    .onCancel(player -> player.sendMessage("Cancelled"))
+    .open(player);
+
+// Danger styling
+ConfirmationGui.create()
+    .message("This cannot be undone!")
+    .danger()
+    .onConfirm(player -> dangerousAction())
+    .open(player);
+```
+
+### Skull Textures
+
+```java
+ItemStack customHead = IonItem.builder(Material.PLAYER_HEAD)
+    .skullTexture("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy4uLiJ9fX0=")
+    .name("<gold>Custom NPC Head")
+    .build();
+```
+
+### Leather Armor Colors
+
+```java
+ItemStack armor = IonItem.builder(Material.LEATHER_CHESTPLATE)
+    .color(Color.fromRGB(255, 100, 50))
+    .name("<gradient:red:orange>Fire Armor")
+    .glow()
+    .build();
+```
+
+### Potion Effects
+
+```java
+ItemStack superPotion = IonItem.builder(Material.POTION)
+    .potionType(PotionType.STRENGTH)
+    .potionEffect(PotionEffectType.SPEED, 600, 2)
+    .potionEffect(PotionEffectType.REGENERATION, 600, 1)
+    .potionColor(Color.PURPLE)
+    .name("<purple>Super Potion")
+    .lore("<gray>Speed III + Regen II")
+    .build();
+```
+
+---
+
+## 🔧 v1.2.6 Features
 
 ### Cooldown Manager
 

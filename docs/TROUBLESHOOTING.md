@@ -1,6 +1,6 @@
 # 🔧 Troubleshooting Guide
 
-Common issues and solutions when using IonAPI.
+**Version**: 1.3.0 | Common issues and solutions when using IonAPI.
 
 ---
 
@@ -18,7 +18,7 @@ plugins {
 }
 
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.2.6")
+    implementation("com.github.mattbaconz:IonAPI:1.3.0")
 }
 
 tasks.shadowJar {
@@ -121,16 +121,21 @@ See [SECURITY.md](../SECURITY.md) for details.
 
 **Problem:** Scoreboard flickers when updating.
 
-**Solution:** Use `dynamicLine()` instead of recreating:
+**Solution (v1.3.0):** IonScoreboard now uses per-line updates that eliminate flashing:
 
 ```java
-// ❌ Wrong - Creates flicker
-board.destroy();
-createNewBoard(player);
+// ✅ v1.3.0 - No flashing! Uses builder pattern
+IonScoreboard board = IonScoreboard.builder()
+    .title("<gold>Stats")
+    .line(15, "<yellow>Level: {level}")
+    .placeholder("level", p -> String.valueOf(p.getLevel()))
+    .updateInterval(20) // Auto-updates smoothly
+    .build();
 
-// ✅ Correct - Smooth updates
-board.updateLine(0, "New text");
-board.update();
+board.show(player);
+
+// Update a single line (no flicker)
+board.setLine(player, 15, "<yellow>Level: 10");
 ```
 
 ---

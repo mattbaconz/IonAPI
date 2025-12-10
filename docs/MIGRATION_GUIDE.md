@@ -1,6 +1,6 @@
 # 🔄 Migration Guide to IonAPI
 
-Quick guide to migrate from Bukkit API to IonAPI.
+**Version**: 1.3.0 | Quick guide to migrate from Bukkit API to IonAPI.
 
 ---
 
@@ -171,7 +171,7 @@ plugin.getScheduler().runAt(player, () -> {
 
 ```kotlin
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.2.6")
+    implementation("com.github.mattbaconz:IonAPI:1.3.0")
 }
 
 tasks.shadowJar {

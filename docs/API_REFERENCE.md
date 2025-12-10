@@ -1,5 +1,8 @@
 # API Reference
 
+**Version**: 1.3.0  
+**Last Updated**: December 10, 2025
+
 ## Core Interfaces
 
 ### IonPlugin
@@ -546,6 +549,144 @@ scheduler.runAsync(() -> {
 - ☕ [Ko-fi](https://ko-fi.com/mbczishim/tip)
 - 💰 [PayPal](https://www.paypal.com/paypalme/MatthewWatuna)
 
+
+---
+
+## v1.3.0 Features
+
+### IonScoreboard (Rewritten)
+
+Flicker-free scoreboard with per-line updates.
+
+```java
+// Create with builder
+IonScoreboard board = IonScoreboard.builder()
+    .title("<gradient:gold:yellow><bold>My Server")
+    .line(15, "<gray>Welcome, <white>{player}")
+    .line(14, "")
+    .line(13, "<gold>Coins: <yellow>{coins}")
+    .line(12, "<green>Online: <white>{online}")
+    .placeholder("player", p -> p.getName())
+    .placeholder("coins", p -> String.valueOf(getCoins(p)))
+    .placeholder("online", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+    .updateInterval(20) // Auto-update every second
+    .build();
+
+board.show(player);
+board.update(player); // Manual refresh
+board.hide(player);
+board.destroy();
+```
+
+**Animated Lines:**
+```java
+IonScoreboard.builder()
+    .title("<gold>Server")
+    .animatedLine(15, 10, "Frame 1", "Frame 2", "Frame 3") // Cycles every 10 ticks
+    .animatedLine(14, "Fast", "Animation") // Default 10 tick interval
+    .build();
+```
+
+**Methods:**
+- `builder()` - Creates new builder
+- `title(String)` - Sets title (MiniMessage)
+- `line(int, String)` - Adds line at score
+- `lines(int, String...)` - Adds multiple lines
+- `animatedLine(int, long, String...)` - Animated line
+- `placeholder(String, Function)` - Dynamic placeholder
+- `updateInterval(long)` - Auto-update in ticks
+- `show(Player)` - Shows to player
+- `update(Player)` - Updates for player
+- `setLine(Player, int, String)` - Update single line
+- `removeLine(int)` - Removes a line
+- `hide(Player)` - Hides from player
+- `destroy()` - Destroys scoreboard
+
+---
+
+### ConfirmationGui (New)
+
+Simple yes/no dialog for confirmations.
+
+```java
+ConfirmationGui.create()
+    .title("<red>⚠ Confirm")
+    .message("Delete all data?")
+    .onConfirm(player -> {
+        deleteData();
+        player.sendMessage("<green>Deleted!");
+    })
+    .onCancel(player -> player.sendMessage("Cancelled"))
+    .open(player);
+
+// Danger styling (red theme)
+ConfirmationGui.create()
+    .message("This cannot be undone!")
+    .danger()
+    .onConfirm(player -> dangerousAction())
+    .open(player);
+
+// Success styling (green theme)
+ConfirmationGui.simple("Proceed?", player -> doAction())
+    .success()
+    .open(player);
+```
+
+**Methods:**
+- `create()` - Creates new builder
+- `simple(String, Consumer)` - Quick creation
+- `title(String)` - Sets title
+- `message(String)` - Sets message
+- `rows(int)` - Sets rows (3-6)
+- `onConfirm(Consumer)` - Confirm action
+- `onCancel(Consumer)` - Cancel action
+- `confirmItem(ItemStack)` - Custom confirm button
+- `cancelItem(ItemStack)` - Custom cancel button
+- `danger()` - Red styling
+- `success()` - Green styling
+- `noSounds()` - Disable sounds
+- `open(Player)` - Opens dialog
+
+---
+
+### Item Builder Enhancements
+
+**Skull Textures:**
+```java
+// Custom head texture via base64
+ItemStack head = IonItem.builder(Material.PLAYER_HEAD)
+    .skullTexture("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy4uLiJ9fX0=")
+    .name("<gold>Custom Head")
+    .build();
+```
+
+**Leather Armor Colors:**
+```java
+ItemStack armor = IonItem.builder(Material.LEATHER_CHESTPLATE)
+    .color(Color.RED)
+    .color(255, 100, 50) // RGB
+    .name("<red>Fire Armor")
+    .build();
+```
+
+**Potion Effects:**
+```java
+ItemStack potion = IonItem.builder(Material.POTION)
+    .potionType(PotionType.STRENGTH)
+    .potionEffect(PotionEffectType.SPEED, 600, 2) // 30 sec Speed III
+    .potionColor(Color.PURPLE)
+    .name("<purple>Super Potion")
+    .build();
+```
+
+**New Methods:**
+- `skullTexture(String)` - Base64 texture for PLAYER_HEAD
+- `color(Color)` - Color for leather armor
+- `color(int, int, int)` - RGB color for leather
+- `potionEffect(PotionEffect)` - Add potion effect
+- `potionEffect(Type, duration, amplifier)` - Add effect
+- `potionType(PotionType)` - Set base potion type
+- `potionColor(Color)` - Set potion color
 
 ---
 

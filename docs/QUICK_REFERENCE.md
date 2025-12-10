@@ -1,6 +1,6 @@
 # IonAPI Quick Reference
 
-A quick cheatsheet for all IonAPI features.
+**Version**: 1.3.0 | A quick cheatsheet for all IonAPI features.
 
 ## Item Builder
 
@@ -61,32 +61,39 @@ gui.update();  // Refresh display
 gui.destroy();
 ```
 
-## Scoreboard
+## Scoreboard (v1.3.0 - No Flashing!)
 
 ```java
-// Basic scoreboard
-IonScoreboard board = IonScoreboard.create(player)
+// Basic scoreboard - uses builder pattern
+IonScoreboard board = IonScoreboard.builder()
     .title("<gold>Server Stats")
-    .line("<gray>Players: 10")
-    .line("<yellow>Level: 5")
-    .line("")
-    .line("<aqua>example.com")
-    .show();
+    .line(15, "<gray>Players: {online}")
+    .line(14, "<yellow>Level: {level}")
+    .line(13, "")
+    .line(12, "<aqua>example.com")
+    .placeholder("online", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+    .placeholder("level", p -> String.valueOf(p.getLevel()))
+    .updateInterval(20) // Auto-update every second
+    .build();
 
-// Dynamic scoreboard
-IonScoreboard dynamic = IonScoreboard.create(player)
-    .title("<gold>Stats")
-    .line("") // Placeholder
-    .line("") // Placeholder
-    .dynamicLine(0, p -> "<gray>Health: " + p.getHealth())
-    .dynamicLine(1, p -> "<yellow>Level: " + p.getLevel())
-    .autoUpdate(20L)  // Update every second
-    .show();
+board.show(player);
 
-// Update
-board.updateLine(0, "<gray>Players: 15");
-board.update();  // Update all dynamic content
-board.hide();
+// Animated scoreboard
+IonScoreboard animated = IonScoreboard.builder()
+    .title("<gradient:gold:yellow>My Server")
+    .animatedLine(15, 10, "✦ Welcome ✦", "★ Welcome ★")
+    .line(14, "<yellow>Online: {online}")
+    .placeholder("online", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+    .updateInterval(20)
+    .build();
+
+animated.show(player);
+
+// Update single line
+board.setLine(player, 15, "<gray>Players: 10");
+
+// Cleanup
+board.hide(player);
 board.destroy();
 ```
 
@@ -418,7 +425,7 @@ import com.ionapi.npc.IonNPC;
 ```kotlin
 dependencies {
     // All-in-one (easiest - recommended)
-    implementation("com.github.mattbaconz:IonAPI:1.2.6")
+    implementation("com.github.mattbaconz:IonAPI:1.3.0")
     
     // OR individual modules:
     // compileOnly("com.ionapi:ion-api:1.2.6")
@@ -468,7 +475,54 @@ dependencies {
 
 ---
 
-## 🆕 v1.2.6 Quick Reference
+## 🆕 v1.3.0 Quick Reference
+
+### Scoreboard (No Flashing!)
+```java
+IonScoreboard.builder()
+    .title("<gold>Server")
+    .line(15, "{player}")
+    .animatedLine(14, 10, "Frame 1", "Frame 2")
+    .placeholder("player", p -> p.getName())
+    .updateInterval(20)
+    .build().show(player);
+```
+
+### ConfirmationGui
+```java
+ConfirmationGui.create()
+    .message("Are you sure?")
+    .onConfirm(p -> doAction())
+    .danger() // or .success()
+    .open(player);
+```
+
+### Skull Textures
+```java
+IonItem.builder(Material.PLAYER_HEAD)
+    .skullTexture("eyJ0ZXh0dXJlcyI6Li4u")
+    .build();
+```
+
+### Leather Colors
+```java
+IonItem.builder(Material.LEATHER_CHESTPLATE)
+    .color(Color.RED)
+    .build();
+```
+
+### Potion Effects
+```java
+IonItem.builder(Material.POTION)
+    .potionType(PotionType.SPEED)
+    .potionEffect(PotionEffectType.REGENERATION, 200, 1)
+    .potionColor(Color.PINK)
+    .build();
+```
+
+---
+
+## 🔧 v1.2.6 Quick Reference
 
 ### Cooldowns
 ```java
@@ -527,7 +581,7 @@ double avg = Metrics.getAverageTime("operation");
 
 ```kotlin
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.2.6")
+    implementation("com.github.mattbaconz:IonAPI:1.3.0")
 }
 ```
 
