@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2025-12-11
+
+### 🐛 Bug Fixes
+*   **Scoreboard Width Stability**: Added `fixedWidth(int)` method to prevent scoreboard from resizing when line content changes. Lines are now padded to maintain consistent width.
+
+### ✨ New Features
+
+#### ion-ui (Scoreboard)
+*   **Fixed Width Lines**: New `fixedWidth(int)` builder method ensures consistent scoreboard width regardless of content length.
+    ```java
+    IonScoreboard.builder()
+        .title("<gold>Server Stats")
+        .line(15, "<yellow>Level: {level}")
+        .placeholder("level", p -> String.valueOf(getLevel(p)))
+        .fixedWidth(20) // Maintains consistent width
+        .build();
+    ```
+
+### 📚 Documentation
+*   Updated `ComprehensiveExample.java` to use proper `IonScoreboard.builder()` API
+*   Updated `README.md` scoreboard examples to use v1.4.0 API with placeholders
+*   Fixed deprecated `create()`, `dynamicLine()`, and `autoUpdate()` method references
+
+---
+
 ## [1.3.0] - 2025-12-10
 
 ### 🐛 Bug Fixes

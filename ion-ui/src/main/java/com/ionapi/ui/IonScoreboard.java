@@ -57,6 +57,7 @@ public class IonScoreboard {
     private final Map<Integer, AnimatedLine> animatedLines;
     private final Map<String, Function<Player, String>> placeholders;
     private final long updateInterval;
+    private final int fixedWidth;
 
     // State per player
     private final Map<UUID, PlayerBoard> playerBoards = new ConcurrentHashMap<>();
@@ -71,6 +72,7 @@ public class IonScoreboard {
         this.animatedLines = new LinkedHashMap<>(builder.animatedLines);
         this.placeholders = new HashMap<>(builder.placeholders);
         this.updateInterval = builder.updateInterval;
+        this.fixedWidth = builder.fixedWidth;
     }
 
     /**
@@ -393,7 +395,28 @@ public class IonScoreboard {
         for (Map.Entry<String, Function<Player, String>> entry : placeholders.entrySet()) {
             text = text.replace("{" + entry.getKey() + "}", entry.getValue().apply(player));
         }
-        return text;
+        return pad(text);
+    }
+
+    /**
+     * Pads the text to the fixed width if configured.
+     * Uses trailing spaces to maintain consistent scoreboard width.
+     *
+     * @param text the text to pad
+     * @return the padded text
+     */
+    private String pad(String text) {
+        if (fixedWidth <= 0) {
+            return text;
+        }
+        // Strip MiniMessage tags to calculate visible length
+        String stripped = MINI.stripTags(text);
+        int visibleLength = stripped.length();
+        if (visibleLength >= fixedWidth) {
+            return text;
+        }
+        // Append trailing spaces wrapped in reset tag to maintain width
+        return text + " ".repeat(fixedWidth - visibleLength);
     }
 
     private Component parseText(String text, Player player) {
@@ -460,6 +483,7 @@ public class IonScoreboard {
         private final Map<Integer, AnimatedLine> animatedLines = new LinkedHashMap<>();
         private final Map<String, Function<Player, String>> placeholders = new HashMap<>();
         private long updateInterval = 0;
+        private int fixedWidth = 0;
 
         /**
          * Sets the scoreboard title.
@@ -552,6 +576,20 @@ public class IonScoreboard {
         @NotNull
         public Builder updateInterval(long ticks) {
             this.updateInterval = Math.max(0, ticks);
+            return this;
+        }
+
+        /**
+         * Sets a fixed width for all lines.
+         * Lines shorter than this width will be padded with trailing spaces
+         * to prevent the scoreboard from resizing when content changes.
+         *
+         * @param width the minimum character width for lines (0 to disable)
+         * @return this builder
+         */
+        @NotNull
+        public Builder fixedWidth(int width) {
+            this.fixedWidth = Math.max(0, width);
             return this;
         }
 

@@ -427,7 +427,7 @@ import com.ionapi.npc.IonNPC;
 ```kotlin
 dependencies {
     // All-in-one (easiest - recommended)
-    implementation("com.github.mattbaconz:IonAPI:1.3.0")
+    implementation("com.github.mattbaconz:IonAPI:1.4.0")
     
     // OR individual modules:
     // compileOnly("com.ionapi:ion-api:1.3.0")
@@ -583,7 +583,7 @@ double avg = Metrics.getAverageTime("operation");
 
 ```kotlin
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.3.0")
+    implementation("com.github.mattbaconz:IonAPI:1.4.0")
 }
 ```
 

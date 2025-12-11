@@ -85,7 +85,7 @@ IonItem.builder(Material.POTION)
 ### Steps
 1. Update dependency version:
 ```kotlin
-implementation("com.github.mattbaconz:IonAPI:1.3.0")
+implementation("com.github.mattbaconz:IonAPI:1.4.0")
 ```
 2. If using `IonScoreboard.create()`, migrate to builder pattern
 3. Rebuild: `./gradlew clean shadowJar`

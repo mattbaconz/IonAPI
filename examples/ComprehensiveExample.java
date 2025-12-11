@@ -195,23 +195,27 @@ public class ComprehensiveExample implements IonPlugin, Listener {
     // ========== Scoreboard ==========
 
     private void createScoreboard(Player player, PlayerStats stats) {
-        IonScoreboard board = IonScoreboard.create(player)
-                .title("§6§l✦ §eYour Stats §6§l✦")
-                .line("§7§m━━━━━━━━━━━━━━")
-                .line("") // Placeholder for dynamic line 1
-                .line("") // Placeholder for dynamic line 2
-                .line("") // Placeholder for dynamic line 3
-                .line("") // Placeholder for dynamic line 4
-                .line("")
-                .line("§7Rank: " + getRankDisplay(stats.getLevel()))
-                .line("§7§m━━━━━━━━━━━━━━")
-                .dynamicLine(1, p -> "§eLevel: §f" + stats.getLevel())
-                .dynamicLine(2, p -> "§aCoins: §f" + stats.getCoins())
-                .dynamicLine(3, p -> "§bKills: §f" + stats.getKills())
-                .dynamicLine(4, p -> "§cDeaths: §f" + stats.getDeaths())
-                .autoUpdate(20L) // Update every second
-                .show();
+        IonScoreboard board = IonScoreboard.builder()
+                .title("<gold><bold>✦ <yellow>Your Stats <gold><bold>✦")
+                .line(15, "<gray>━━━━━━━━━━━━━━")
+                .line(14, "<yellow>Level: <white>{level}")
+                .line(13, "<green>Coins: <white>{coins}")
+                .line(12, "<aqua>Kills: <white>{kills}")
+                .line(11, "<red>Deaths: <white>{deaths}")
+                .line(10, "")
+                .line(9, "<gray>Rank: <white>{rank}")
+                .line(8, "<gray>━━━━━━━━━━━━━━")
+                .placeholder("level", p -> String.valueOf(cachedStats.getOrDefault(p.getUniqueId(), stats).getLevel()))
+                .placeholder("coins", p -> String.valueOf(cachedStats.getOrDefault(p.getUniqueId(), stats).getCoins()))
+                .placeholder("kills", p -> String.valueOf(cachedStats.getOrDefault(p.getUniqueId(), stats).getKills()))
+                .placeholder("deaths",
+                        p -> String.valueOf(cachedStats.getOrDefault(p.getUniqueId(), stats).getDeaths()))
+                .placeholder("rank", p -> getRankDisplay(cachedStats.getOrDefault(p.getUniqueId(), stats).getLevel()))
+                .updateInterval(20) // Update every second
+                .fixedWidth(20) // Prevent width changes
+                .build();
 
+        board.show(player);
         playerScoreboards.put(player.getUniqueId(), board);
     }
 
@@ -226,7 +230,7 @@ public class ComprehensiveExample implements IonPlugin, Listener {
                 .show(player);
 
         // Fade out after 5 seconds
-        int[] countdown = {5};
+        int[] countdown = { 5 };
         getScheduler().runTimer(() -> {
             countdown[0]--;
             if (countdown[0] <= 0) {
@@ -251,8 +255,7 @@ public class ComprehensiveExample implements IonPlugin, Listener {
                         "§bKills: §f" + stats.getKills(),
                         "§cDeaths: §f" + stats.getDeaths(),
                         "",
-                        "§7Total Logins: §f" + stats.getLogins()
-                )
+                        "§7Total Logins: §f" + stats.getLogins())
                 .glow()
                 .build();
 
@@ -265,8 +268,7 @@ public class ComprehensiveExample implements IonPlugin, Listener {
                         "§a+ 100 Coins",
                         "§a+ 50 XP",
                         "",
-                        "§e§lClick to claim!"
-                )
+                        "§e§lClick to claim!")
                 .enchant(Enchantment.LURE, 1)
                 .flags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS)
                 .build();
@@ -279,8 +281,7 @@ public class ComprehensiveExample implements IonPlugin, Listener {
                         "§cCost: §f" + (stats.getLevel() * 100) + " coins",
                         "§aReward: §f+1 Level",
                         "",
-                        "§e§lClick to level up!"
-                )
+                        "§e§lClick to level up!")
                 .glow()
                 .build();
 
@@ -291,8 +292,7 @@ public class ComprehensiveExample implements IonPlugin, Listener {
                         "",
                         "§eK/D Ratio: §f" + String.format("%.2f", stats.getKDRatio()),
                         "§eAverage XP: §f" + (stats.getLevel() * 100),
-                        "§eMember Since: §f" + formatTime(stats.getFirstJoin())
-                )
+                        "§eMember Since: §f" + formatTime(stats.getFirstJoin()))
                 .build();
 
         // Create GUI
@@ -385,8 +385,7 @@ public class ComprehensiveExample implements IonPlugin, Listener {
                     player.getWorld().spawnParticle(
                             org.bukkit.Particle.VILLAGER_HAPPY,
                             player.getLocation().add(0, 1, 0),
-                            50, 0.5, 0.5, 0.5, 0.1
-                    );
+                            50, 0.5, 0.5, 0.5, 0.1);
 
                     // Show level up BossBar
                     IonBossBar levelBar = IonBossBar.create()
@@ -417,18 +416,25 @@ public class ComprehensiveExample implements IonPlugin, Listener {
     }
 
     private String getRankDisplay(int level) {
-        if (level >= 50) return "§6§lLegend";
-        if (level >= 30) return "§5§lMaster";
-        if (level >= 20) return "§b§lExpert";
-        if (level >= 10) return "§a§lVeteran";
+        if (level >= 50)
+            return "§6§lLegend";
+        if (level >= 30)
+            return "§5§lMaster";
+        if (level >= 20)
+            return "§b§lExpert";
+        if (level >= 10)
+            return "§a§lVeteran";
         return "§7Novice";
     }
 
     private String formatTime(long timestamp) {
         long days = (System.currentTimeMillis() - timestamp) / (24 * 60 * 60 * 1000);
-        if (days > 365) return (days / 365) + " years ago";
-        if (days > 30) return (days / 30) + " months ago";
-        if (days > 0) return days + " days ago";
+        if (days > 365)
+            return (days / 365) + " years ago";
+        if (days > 30)
+            return (days / 30) + " months ago";
+        if (days > 0)
+            return days + " days ago";
         return "Today";
     }
 
@@ -566,7 +572,8 @@ public class ComprehensiveExample implements IonPlugin, Listener {
         }
 
         public double getKDRatio() {
-            if (deaths == 0) return kills;
+            if (deaths == 0)
+                return kills;
             return (double) kills / deaths;
         }
     }

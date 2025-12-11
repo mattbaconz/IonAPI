@@ -205,7 +205,7 @@ repositories {
 
 dependencies {
     // IonAPI automatically shades into your plugin!
-    implementation("com.github.mattbaconz:IonAPI:1.3.0")
+    implementation("com.github.mattbaconz:IonAPI:1.4.0")
 }
 
 tasks.shadowJar {
@@ -232,7 +232,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.mattbaconz:IonAPI:1.3.0'
+    implementation 'com.github.mattbaconz:IonAPI:1.4.0'
 }
 
 shadowJar {
@@ -254,7 +254,7 @@ shadowJar {
     <dependency>
         <groupId>com.github.mattbaconz</groupId>
         <artifactId>IonAPI</artifactId>
-        <version>1.3.0</version>
+        <version>1.4.0</version>
     </dependency>
 </dependencies>
 
@@ -313,8 +313,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.3.0")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    implementation("com.github.mattbaconz:IonAPI:1.4.0")
 }
 
 tasks {
@@ -407,8 +407,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.3.0")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    implementation("com.github.mattbaconz:IonAPI:1.4.0")
 }
 
 tasks.shadowJar {
@@ -474,15 +474,19 @@ IonGui.builder()
 ### 📊 Dynamic Scoreboard
 
 ```java
-IonScoreboard.create(player)
+IonScoreboard.builder()
     .title("<gold><bold>⚡ Server Stats")
-    .line("<gray>━━━━━━━━━━━━━━")
-    .line("")
-    .line("")
-    .dynamicLine(1, p -> "<yellow>Players: <white>" + Bukkit.getOnlinePlayers().size())
-    .dynamicLine(2, p -> "<green>Health: <white>" + (int) p.getHealth() + "❤")
-    .autoUpdate(20L)  // Updates every second
-    .show();
+    .line(15, "<gray>━━━━━━━━━━━━━━")
+    .line(14, "<yellow>Players: <white>{players}")
+    .line(13, "<green>Health: <white>{health}")
+    .line(12, "")
+    .line(11, "<aqua>example.com")
+    .placeholder("players", p -> String.valueOf(Bukkit.getOnlinePlayers().size()))
+    .placeholder("health", p -> String.valueOf((int) p.getHealth()) + "❤")
+    .updateInterval(20)  // Updates every second
+    .fixedWidth(20)      // Prevents width changes
+    .build()
+    .show(player);
 ```
 
 ### 🔗 Task Chains (Async/Sync)
