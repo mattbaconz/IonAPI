@@ -1,4 +1,4 @@
-package com.ionapi.npc.impl;
+package com.ionapi.npc.adapter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -7,19 +7,13 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.EnumSet;
-import java.util.List;
 import java.util.UUID;
 
 /**
- * Reflection helper for NMS packet operations.
- * Supports multiple Minecraft versions.
- * 
- * @deprecated Use {@link com.ionapi.npc.adapter.ReflectionNmsAdapter} instead.
- *             This class is kept for backwards compatibility but will be removed in a future version.
+ * Reflection-based NMS adapter implementation.
+ * Uses reflection to work across multiple Minecraft versions.
  */
-@Deprecated
-public class ReflectionHelper {
+public class ReflectionNmsAdapter implements NmsAdapter {
 
     private final String version;
     private final boolean isModern; // 1.17+
@@ -28,12 +22,9 @@ public class ReflectionHelper {
     private Class<?> craftPlayerClass;
     private Class<?> gameProfileClass;
     private Class<?> propertyClass;
-    private Class<?> packetClass;
-    private Method sendPacketMethod;
     private Method getHandleMethod;
-    private Field connectionField;
     
-    public ReflectionHelper() {
+    public ReflectionNmsAdapter() {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
         this.version = packageName.split("\\.").length > 3 ? packageName.split("\\.")[3] : "";
         this.isModern = version.isEmpty() || !version.startsWith("v1_16") && !version.startsWith("v1_15");
@@ -56,6 +47,7 @@ public class ReflectionHelper {
         propertyClass = Class.forName("com.mojang.authlib.properties.Property");
     }
 
+    @Override
     public Object createGameProfile(UUID uuid, String name) {
         try {
             Constructor<?> constructor = gameProfileClass.getConstructor(UUID.class, String.class);
@@ -65,6 +57,7 @@ public class ReflectionHelper {
         }
     }
 
+    @Override
     public void setSkin(Object gameProfile, String texture, String signature) {
         try {
             Method getProperties = gameProfileClass.getMethod("getProperties");
@@ -80,6 +73,7 @@ public class ReflectionHelper {
         }
     }
 
+    @Override
     public void sendPacket(Player player, Object packet) {
         try {
             Object handle = getHandleMethod.invoke(craftPlayerClass.cast(player));
@@ -117,6 +111,7 @@ public class ReflectionHelper {
         throw new NoSuchMethodException("Could not find send method");
     }
 
+    @Override
     public Object createPlayerInfoPacket(Object gameProfile, int entityId, UUID uuid) throws Exception {
         // This is version-specific and complex - simplified stub
         // In production, you'd need version-specific implementations
@@ -125,36 +120,43 @@ public class ReflectionHelper {
         return createDummyPacket();
     }
 
-    public Object createSpawnPacket(int entityId, UUID uuid, Location loc) throws Exception {
+    @Override
+    public Object createSpawnPacket(int entityId, UUID uuid, Location location) throws Exception {
         Class<?> packetClass = getNMSClass("ClientboundAddEntityPacket");
         return createDummyPacket();
     }
 
+    @Override
     public Object createHeadRotationPacket(int entityId, float yaw) throws Exception {
         Class<?> packetClass = getNMSClass("ClientboundRotateHeadPacket");
         return createDummyPacket();
     }
 
+    @Override
     public Object createPlayerInfoRemovePacket(UUID uuid) throws Exception {
         Class<?> packetClass = getNMSClass("ClientboundPlayerInfoRemovePacket");
         return createDummyPacket();
     }
 
+    @Override
     public Object createDestroyPacket(int entityId) throws Exception {
         Class<?> packetClass = getNMSClass("ClientboundRemoveEntitiesPacket");
         return createDummyPacket();
     }
 
-    public Object createTeleportPacket(int entityId, Location loc) throws Exception {
+    @Override
+    public Object createTeleportPacket(int entityId, Location location) throws Exception {
         Class<?> packetClass = getNMSClass("ClientboundTeleportEntityPacket");
         return createDummyPacket();
     }
 
+    @Override
     public Object createRotationPacket(int entityId, float yaw, float pitch) throws Exception {
         Class<?> packetClass = getNMSClass("ClientboundMoveEntityPacket$Rot");
         return createDummyPacket();
     }
 
+    @Override
     public Object createAnimationPacket(int entityId, int animation) throws Exception {
         Class<?> packetClass = getNMSClass("ClientboundAnimatePacket");
         return createDummyPacket();

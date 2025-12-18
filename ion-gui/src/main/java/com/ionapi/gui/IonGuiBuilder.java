@@ -567,6 +567,10 @@ public class IonGuiBuilder implements IonGui {
 
         // Clicking outside or in player's own inventory (bottom inventory)
         if (slot < 0 || slot >= inventory.getSize()) {
+            // Block shift-click and hotbar swap from player inventory into GUI
+            if (event.isShiftClick() || event.getHotbarButton() >= 0) {
+                event.setCancelled(true);
+            }
             return;
         }
 
@@ -653,35 +657,35 @@ public class IonGuiBuilder implements IonGui {
     }
 
     private class GuiListener implements Listener {
-        @EventHandler(priority = EventPriority.NORMAL)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryClick(InventoryClickEvent event) {
             if (event.getInventory().getHolder() instanceof GuiHolder holder && holder.gui() == IonGuiBuilder.this) {
                 handleClick(event);
             }
         }
 
-        @EventHandler(priority = EventPriority.NORMAL)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryDrag(InventoryDragEvent event) {
             if (event.getInventory().getHolder() instanceof GuiHolder holder && holder.gui() == IonGuiBuilder.this) {
                 handleDrag(event);
             }
         }
 
-        @EventHandler(priority = EventPriority.NORMAL)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryOpen(InventoryOpenEvent event) {
             if (event.getInventory().getHolder() instanceof GuiHolder holder && holder.gui() == IonGuiBuilder.this) {
                 handleOpen(event);
             }
         }
 
-        @EventHandler(priority = EventPriority.NORMAL)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void onInventoryClose(InventoryCloseEvent event) {
             if (event.getInventory().getHolder() instanceof GuiHolder holder && holder.gui() == IonGuiBuilder.this) {
                 handleClose(event);
             }
         }
 
-        @EventHandler(priority = EventPriority.NORMAL)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void onPlayerQuit(PlayerQuitEvent event) {
             Player player = event.getPlayer();
             if (player.getOpenInventory().getTopInventory().getHolder() instanceof GuiHolder holder

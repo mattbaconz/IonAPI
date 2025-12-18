@@ -1,6 +1,6 @@
 # API Reference
 
-**Version**: 1.3.0  
+**Version**: 1.5.0  
 **Last Updated**: December 10, 2025
 
 ## Core Interfaces
@@ -552,7 +552,7 @@ scheduler.runAsync(() -> {
 
 ---
 
-## v1.3.0 Features
+## v1.5.0 Features
 
 ### IonScoreboard (Rewritten)
 

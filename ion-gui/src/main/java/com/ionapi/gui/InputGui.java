@@ -30,17 +30,18 @@ import java.util.function.Predicate;
  * Anvil-based text input GUI.
  * 
  * Example:
+ * 
  * <pre>{@code
  * InputGui.create(plugin)
- *     .title("Enter player name")
- *     .placeholder("Type here...")
- *     .onComplete((player, input) -> {
- *         player.sendMessage("You entered: " + input);
- *     })
- *     .onCancel(player -> {
- *         player.sendMessage("Cancelled!");
- *     })
- *     .open(player);
+ *         .title("Enter player name")
+ *         .placeholder("Type here...")
+ *         .onComplete((player, input) -> {
+ *             player.sendMessage("You entered: " + input);
+ *         })
+ *         .onCancel(player -> {
+ *             player.sendMessage("Cancelled!");
+ *         })
+ *         .open(player);
  * }</pre>
  */
 public class InputGui implements Listener {
@@ -114,9 +115,10 @@ public class InputGui implements Listener {
         inv.setItem(0, item);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPrepareAnvil(PrepareAnvilEvent event) {
-        if (view == null || event.getView() != view) return;
+        if (view == null || event.getView() != view)
+            return;
 
         AnvilInventory anvil = event.getInventory();
         String text = anvil.getRenameText();
@@ -134,10 +136,12 @@ public class InputGui implements Listener {
         anvil.setRepairCost(0);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (view == null || event.getView() != view) return;
-        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (view == null || event.getView() != view)
+            return;
+        if (!(event.getWhoClicked() instanceof Player player))
+            return;
 
         event.setCancelled(true);
 
@@ -152,7 +156,8 @@ public class InputGui implements Listener {
 
             // Validate input
             if (validator != null && !validator.test(input)) {
-                if (errorSound != null) errorSound.play(player);
+                if (errorSound != null)
+                    errorSound.play(player);
                 if (validationError != null) {
                     player.sendMessage(validationError);
                 }
@@ -160,7 +165,8 @@ public class InputGui implements Listener {
             }
 
             completed = true;
-            if (completeSound != null) completeSound.play(player);
+            if (completeSound != null)
+                completeSound.play(player);
 
             if (closeOnComplete) {
                 player.closeInventory();
@@ -172,10 +178,12 @@ public class InputGui implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (view == null || event.getView() != view) return;
-        if (!(event.getPlayer() instanceof Player player)) return;
+        if (view == null || event.getView() != view)
+            return;
+        if (!(event.getPlayer() instanceof Player player))
+            return;
 
         HandlerList.unregisterAll(this);
         view = null;
@@ -207,8 +215,8 @@ public class InputGui implements Listener {
         public Builder(@NotNull Plugin plugin) {
             this.plugin = plugin;
             this.inputItem = IonItem.builder(Material.PAPER)
-                .name(" ")
-                .build();
+                    .name(" ")
+                    .build();
         }
 
         public Builder title(@NotNull String title) {

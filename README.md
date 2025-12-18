@@ -165,6 +165,13 @@ ItemStack sword = IonItem.builder(Material.DIAMOND_SWORD)
 - 🧪 **Unit Testing** - Mock framework (~21 KB)
 - 🔄 **Compatibility Layer** - Java 8+ polyfills (~38 KB)
 
+### 🚀 v1.5.0 Features (Enterprise-Grade)
+- 📢 **Working Event Bus** - Real in-memory event dispatcher with priority sorting
+- 💾 **SQL Injection Protection** - Identifier quoting (`backticks`) for all table/column names
+- 💉 **Advanced DI** - Constructor injection support + Circular dependency detection
+- 💾 **No Thread Starvation** - Dedicated database executors for all async operations
+- 👻 **NPC Bridge Pattern** - Refactored to `NmsAdapter` interface for modularity
+
 ### 🆕 v1.3.0 Features
 - 📊 **Scoreboard Fix** - No more flashing on updates
 - ✨ **Animated Lines** - Cycling scoreboard text
@@ -205,7 +212,7 @@ repositories {
 
 dependencies {
     // IonAPI automatically shades into your plugin!
-    implementation("com.github.mattbaconz:IonAPI:1.4.0")
+    implementation("com.github.mattbaconz:IonAPI:1.5.0")
 }
 
 tasks.shadowJar {
@@ -232,7 +239,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.mattbaconz:IonAPI:1.4.0'
+    implementation 'com.github.mattbaconz:IonAPI:1.5.0'
 }
 
 shadowJar {
@@ -314,7 +321,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.4.0")
+    implementation("com.github.mattbaconz:IonAPI:1.5.0")
 }
 
 tasks {
@@ -408,7 +415,7 @@ plugins {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    implementation("com.github.mattbaconz:IonAPI:1.4.0")
+    implementation("com.github.mattbaconz:IonAPI:1.5.0")
 }
 
 tasks.shadowJar {

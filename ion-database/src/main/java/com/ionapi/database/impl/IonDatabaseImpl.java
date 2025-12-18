@@ -14,6 +14,9 @@ import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,6 +31,7 @@ public class IonDatabaseImpl implements IonDatabase {
 
     private final DatabaseType type;
     private final HikariDataSource dataSource;
+    private final ExecutorService dbExecutor;
     private final long startTime;
     private boolean queryLogging = false;
 
@@ -58,6 +62,7 @@ public class IonDatabaseImpl implements IonDatabase {
         config.setPoolName("IonDatabase-Pool");
 
         this.dataSource = new HikariDataSource(config);
+        this.dbExecutor = Executors.newFixedThreadPool(poolSize);
     }
 
     @Override
@@ -82,6 +87,17 @@ public class IonDatabaseImpl implements IonDatabase {
 
     @Override
     public void disconnect() {
+        if (dbExecutor != null) {
+            dbExecutor.shutdown();
+            try {
+                if (!dbExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                    dbExecutor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                dbExecutor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
         }
@@ -153,7 +169,7 @@ public class IonDatabaseImpl implements IonDatabase {
             } catch (DatabaseException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, dbExecutor);
     }
 
     @Override
@@ -164,7 +180,7 @@ public class IonDatabaseImpl implements IonDatabase {
             } catch (DatabaseException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, dbExecutor);
     }
 
     @Override
@@ -179,7 +195,7 @@ public class IonDatabaseImpl implements IonDatabase {
         Field pkField = getPrimaryKeyField(entityClass);
         String pkColumn = getColumnName(pkField);
 
-        String sql = "SELECT * FROM " + tableName + " WHERE " + pkColumn + " = ?";
+        String sql = "SELECT * FROM " + quote(tableName) + " WHERE " + quote(pkColumn) + " = ?";
         
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -204,13 +220,13 @@ public class IonDatabaseImpl implements IonDatabase {
             } catch (DatabaseException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, dbExecutor);
     }
 
     @Override
     public @NotNull <T> List<T> findAll(@NotNull Class<T> entityClass) throws DatabaseException {
         String tableName = getTableName(entityClass);
-        String sql = "SELECT * FROM " + tableName;
+        String sql = "SELECT * FROM " + quote(tableName);
         List<T> results = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -233,7 +249,7 @@ public class IonDatabaseImpl implements IonDatabase {
             } catch (DatabaseException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, dbExecutor);
     }
 
     @Override
@@ -262,7 +278,7 @@ public class IonDatabaseImpl implements IonDatabase {
             } catch (DatabaseException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, dbExecutor);
     }
 
     @Override
@@ -271,7 +287,7 @@ public class IonDatabaseImpl implements IonDatabase {
         String tableName = getTableName(entityClass);
         List<Field> columns = getColumnFields(entityClass);
 
-        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append(" (");
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(quote(tableName)).append(" (");
         StringBuilder values = new StringBuilder("VALUES (");
         List<Object> params = new ArrayList<>();
 
@@ -288,7 +304,7 @@ public class IonDatabaseImpl implements IonDatabase {
                 sql.append(", ");
                 values.append(", ");
             }
-            sql.append(getColumnName(field));
+            sql.append(quote(getColumnName(field)));
             values.append("?");
             
             try {
@@ -310,7 +326,7 @@ public class IonDatabaseImpl implements IonDatabase {
         Field pkField = getPrimaryKeyField(entityClass);
         List<Field> columns = getColumnFields(entityClass);
 
-        StringBuilder sql = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
+        StringBuilder sql = new StringBuilder("UPDATE ").append(quote(tableName)).append(" SET ");
         List<Object> params = new ArrayList<>();
 
         boolean first = true;
@@ -319,7 +335,7 @@ public class IonDatabaseImpl implements IonDatabase {
             field.setAccessible(true);
 
             if (!first) sql.append(", ");
-            sql.append(getColumnName(field)).append(" = ?");
+            sql.append(quote(getColumnName(field))).append(" = ?");
             
             try {
                 params.add(field.get(entity));
@@ -329,7 +345,7 @@ public class IonDatabaseImpl implements IonDatabase {
             first = false;
         }
 
-        sql.append(" WHERE ").append(getColumnName(pkField)).append(" = ?");
+        sql.append(" WHERE ").append(quote(getColumnName(pkField))).append(" = ?");
         pkField.setAccessible(true);
         try {
             params.add(pkField.get(entity));
@@ -362,7 +378,7 @@ public class IonDatabaseImpl implements IonDatabase {
             } catch (DatabaseException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, dbExecutor);
     }
 
     @Override
@@ -371,7 +387,7 @@ public class IonDatabaseImpl implements IonDatabase {
         Field pkField = getPrimaryKeyField(entityClass);
         String pkColumn = getColumnName(pkField);
 
-        String sql = "DELETE FROM " + tableName + " WHERE " + pkColumn + " = ?";
+        String sql = "DELETE FROM " + quote(tableName) + " WHERE " + quote(pkColumn) + " = ?";
         return execute(sql, primaryKey) > 0;
     }
 
@@ -381,12 +397,12 @@ public class IonDatabaseImpl implements IonDatabase {
         List<Field> columns = getColumnFields(entityClass);
         Field pkField = getPrimaryKeyField(entityClass);
 
-        StringBuilder sql = new StringBuilder("CREATE TABLE IF NOT EXISTS ").append(tableName).append(" (");
+        StringBuilder sql = new StringBuilder("CREATE TABLE IF NOT EXISTS ").append(quote(tableName)).append(" (");
         
         boolean first = true;
         for (Field field : columns) {
             if (!first) sql.append(", ");
-            sql.append(getColumnName(field)).append(" ").append(getSqlType(field));
+            sql.append(quote(getColumnName(field))).append(" ").append(getSqlType(field));
             
             // Handle primary key
             if (field.equals(pkField)) {
@@ -417,7 +433,7 @@ public class IonDatabaseImpl implements IonDatabase {
     @Override
     public <T> void dropTable(@NotNull Class<T> entityClass) throws DatabaseException {
         String tableName = getTableName(entityClass);
-        execute("DROP TABLE IF EXISTS " + tableName);
+        execute("DROP TABLE IF EXISTS " + quote(tableName));
     }
 
     @Override
@@ -461,7 +477,7 @@ public class IonDatabaseImpl implements IonDatabase {
             } catch (DatabaseException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, dbExecutor);
     }
 
     @Override
@@ -544,6 +560,15 @@ public class IonDatabaseImpl implements IonDatabase {
         totalQueryTime.addAndGet(elapsed);
         slowestQuery.updateAndGet(current -> Math.max(current, elapsed));
         fastestQuery.updateAndGet(current -> Math.min(current, elapsed));
+    }
+
+    /**
+     * Quotes an SQL identifier (table or column name) to prevent SQL injection
+     * and allow reserved words as identifiers.
+     */
+    private String quote(String identifier) {
+        // Escape any backticks in the identifier to prevent injection
+        return "`" + identifier.replace("`", "``") + "`";
     }
 
     private void setParameters(PreparedStatement stmt, Object... params) throws SQLException {

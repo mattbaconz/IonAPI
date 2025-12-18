@@ -4,7 +4,61 @@ How to upgrade between IonAPI versions.
 
 ---
 
-## Current Version: 1.3.0
+## Current Version: 1.5.0
+
+---
+
+## Upgrading to v1.5.0 from v1.4.x (Enterprise Refactoring)
+
+### What's New
+- 📢 **Working Event Bus** - Real in-memory event dispatcher with priority sorting.
+- 💾 **SQL Injection Protection** - Identifier quoting (`backticks`) for all table/column names.
+- 💉 **Advanced DI** - Added constructor injection and circular dependency detection.
+- 💾 **Database Performance** - Fixed thread starvation with dedicated executors.
+- 👻 **NPC Bridge Pattern** - Refactored NPCs to use `NmsAdapter` interface for modularity.
+
+### Breaking Changes
+
+#### 1. NPC Implementation (Bridge Pattern)
+`PacketNPC` no longer uses the static `ReflectionHelper`. It now requires an `NmsAdapter` in its constructor for maximum modularity.
+
+```java
+// Old (v1.4.x)
+PacketNPC npc = new PacketNPC(plugin, location, ...);
+
+// New (v1.5.0) - Backwards compatible constructor still works
+PacketNPC npc = new PacketNPC(plugin, location, ...); 
+
+// New (v1.5.0) - Recommended: Explicit adapter injection
+NmsAdapter adapter = new ReflectionNmsAdapter();
+PacketNPC npc = new PacketNPC(plugin, adapter, location, ...);
+```
+
+#### 2. Event Bus Implementation
+`SimpleEventBus` now actually dispatches events! If you were previously relying on its "silent" behavior for testing, you may need to update your tests.
+
+### New Features You Can Use
+
+#### Constructor Injection
+You can now use `@Inject` on constructors in your DI-managed classes.
+
+```java
+public class MyService {
+    private final PlayerService players;
+    
+    @Inject
+    public MyService(PlayerService players) {
+        this.players = players;
+    }
+}
+```
+
+#### SQL Identifier Quoting
+Table and column names are now automatically quoted. This prevents errors when using reserved words like `order` or `group` as table/column names.
+```java
+@Table("group") // Previously failed, now works!
+public class UserGroup { ... }
+```
 
 ---
 
@@ -85,7 +139,7 @@ IonItem.builder(Material.POTION)
 ### Steps
 1. Update dependency version:
 ```kotlin
-implementation("com.github.mattbaconz:IonAPI:1.4.0")
+implementation("com.github.mattbaconz:IonAPI:1.5.0")
 ```
 2. If using `IonScoreboard.create()`, migrate to builder pattern
 3. Rebuild: `./gradlew clean shadowJar`
@@ -265,9 +319,9 @@ When upgrading any version:
 
 | IonAPI | Java | Paper | Folia | Vault |
 |--------|------|-------|-------|-------|
+| 1.5.0  | 21   | 1.20+ | ✅    | 1.7+  |
+| 1.4.5  | 21   | 1.20+ | ✅    | 1.7+  |
 | 1.3.0  | 17+  | 1.19+ | ✅    | 1.7+  |
-| 1.2.6  | 17+  | 1.19+ | ✅    | 1.7+  |
-| 1.2.5  | 17+  | 1.19+ | ✅    | 1.7+  |
 | 1.2.0  | 17+  | 1.19+ | ✅    | 1.7+  |
 | 1.1.0  | 17+  | 1.19+ | ✅    | 1.7+  |
 | 1.0.0  | 17+  | 1.19+ | ⚠️    | 1.7+  |

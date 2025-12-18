@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2025-12-12
+
+### 🐛 Bug Fixes
+
+#### ion-gui
+* **Event Priority Hardening**: Changed all GUI event handlers from `EventPriority.NORMAL` to `EventPriority.HIGHEST` to prevent other plugins from un-canceling cancelled events and causing item exploits.
+  - `IonGuiBuilder`: 5 handlers updated
+  - `InputGui`: 3 handlers updated
+  - `SignInput`: 1 handler updated
+* **Shift-Click Exploit Fixed**: Added blocking for shift-click and hotbar swap (number keys) when clicking in player inventory, preventing items from being moved into GUIs.
+* **ConfirmationGui Double-Callback Fixed**: Added `handled` flag to prevent `onCancel` callback from firing twice when Confirm/Cancel buttons are clicked (once from button, once from close handler).
+
+#### Examples
+* **ComprehensiveExample.java**: Fixed compile error - changed `.async()` to `.asyncSupply()` for lambda that returns a value.
+
+---
+
 ## [1.4.0] - 2025-12-11
 
 ### 🐛 Bug Fixes
@@ -32,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.0] - 2025-12-10
+## [1.5.0] - 2025-12-10
 
 ### 🐛 Bug Fixes
 *   **Scoreboard Flashing Fixed**: Completely rewrote `IonScoreboard` to use per-line Team prefix updates instead of clearing all entries. Scoreboards now update smoothly without any visible flashing.

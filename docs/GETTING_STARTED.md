@@ -25,12 +25,12 @@ repositories {
 
 dependencies {
     // All-in-one (recommended)
-    implementation("com.github.mattbaconz:IonAPI:1.4.0")
+    implementation("com.github.mattbaconz:IonAPI:1.5.0")
     
     // OR individual modules:
-    // implementation("com.ionapi:ion-api:1.3.0")
-    // implementation("com.ionapi:ion-database:1.3.0")
-    // implementation("com.ionapi:ion-economy:1.3.0")
+    // implementation("com.ionapi:ion-api:1.5.0")
+    // implementation("com.ionapi:ion-database:1.5.0")
+    // implementation("com.ionapi:ion-economy:1.5.0")
 }
 ```
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.mattbaconz:IonAPI:1.4.0'
+    implementation 'com.github.mattbaconz:IonAPI:1.5.0'
 }
 ```
 
@@ -52,7 +52,7 @@ dependencies {
     <dependency>
         <groupId>com.github.mattbaconz</groupId>
         <artifactId>IonAPI</artifactId>
-        <version>1.3.0</version>
+        <version>1.5.0</version>
     </dependency>
 </dependencies>
 ```

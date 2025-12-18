@@ -6,14 +6,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
 /**
  * Lightweight dependency injection container for IonAPI plugins.
- * Automatically injects dependencies into fields annotated with {@link Inject}.
+ * Supports both field injection (@Inject on fields) and constructor injection (@Inject on constructors).
  * 
  * <p>Example usage:</p>
  * <pre>{@code
@@ -46,6 +45,11 @@ public final class IonInjector {
     private final Map<Class<?>, Object> singletons = new HashMap<>();
     private final Map<Class<?>, Supplier<?>> factories = new HashMap<>();
     private final Map<String, Object> namedBindings = new HashMap<>();
+    
+    /**
+     * Thread-local set to track classes currently being created for circular dependency detection.
+     */
+    private final ThreadLocal<Set<Class<?>>> currentlyCreating = ThreadLocal.withInitial(HashSet::new);
 
     private IonInjector(@NotNull JavaPlugin plugin) {
         this.plugin = plugin;
@@ -64,12 +68,21 @@ public final class IonInjector {
 
     /**
      * Creates an instance of the given class with dependencies injected.
+     * Supports constructor injection (if @Inject annotated constructor exists) and field injection.
      * 
      * @param clazz the class to instantiate
      * @return the created instance with injected dependencies
+     * @throws InjectionException if circular dependency is detected or instantiation fails
      */
     @NotNull
     public <T> T create(@NotNull Class<T> clazz) {
+        // Check for circular dependency
+        Set<Class<?>> creating = currentlyCreating.get();
+        if (creating.contains(clazz)) {
+            throw new InjectionException("Circular dependency detected while creating " + clazz.getName() 
+                + ". Dependency chain: " + creating);
+        }
+        
         try {
             // Check if it's a registered singleton
             if (singletons.containsKey(clazz)) {
@@ -83,16 +96,26 @@ public final class IonInjector {
                 return instance;
             }
 
-            // Create new instance
-            T instance = instantiate(clazz);
-            inject(instance);
+            // Mark as currently being created (for circular dependency detection)
+            creating.add(clazz);
+            
+            try {
+                // Create new instance
+                T instance = instantiate(clazz);
+                inject(instance);
 
-            // Cache if singleton
-            if (clazz.isAnnotationPresent(Singleton.class)) {
-                singletons.put(clazz, instance);
+                // Cache if singleton
+                if (clazz.isAnnotationPresent(Singleton.class)) {
+                    singletons.put(clazz, instance);
+                }
+
+                return instance;
+            } finally {
+                // Remove from currently creating set
+                creating.remove(clazz);
             }
-
-            return instance;
+        } catch (InjectionException e) {
+            throw e;
         } catch (Exception e) {
             throw new InjectionException("Failed to create instance of " + clazz.getName(), e);
         }
@@ -214,7 +237,13 @@ public final class IonInjector {
 
     @SuppressWarnings("unchecked")
     private <T> T instantiate(Class<T> clazz) throws Exception {
-        // Try no-arg constructor first
+        // First, try to find a constructor annotated with @Inject
+        Constructor<T> injectConstructor = findInjectConstructor(clazz);
+        if (injectConstructor != null) {
+            return instantiateWithConstructor(injectConstructor);
+        }
+        
+        // Try no-arg constructor
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -236,7 +265,53 @@ public final class IonInjector {
         } catch (NoSuchMethodException ignored) {}
 
         throw new InjectionException("No suitable constructor found for " + clazz.getName() 
-            + ". Add a no-arg constructor or a constructor accepting JavaPlugin.");
+            + ". Add a no-arg constructor, a constructor accepting JavaPlugin, or annotate a constructor with @Inject.");
+    }
+    
+    /**
+     * Finds a constructor annotated with @Inject in the given class.
+     * 
+     * @param clazz the class to search
+     * @return the @Inject annotated constructor, or null if none found
+     */
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private <T> Constructor<T> findInjectConstructor(Class<T> clazz) {
+        for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
+            if (constructor.isAnnotationPresent(Inject.class)) {
+                return (Constructor<T>) constructor;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Instantiates a class using the given constructor, resolving all parameters.
+     * 
+     * @param constructor the @Inject annotated constructor
+     * @return the created instance
+     */
+    private <T> T instantiateWithConstructor(Constructor<T> constructor) throws Exception {
+        constructor.setAccessible(true);
+        Class<?>[] paramTypes = constructor.getParameterTypes();
+        Object[] params = new Object[paramTypes.length];
+        
+        for (int i = 0; i < paramTypes.length; i++) {
+            Object resolved = resolve(paramTypes[i]);
+            if (resolved == null) {
+                // Try to create the dependency
+                if (!paramTypes[i].isInterface() && !java.lang.reflect.Modifier.isAbstract(paramTypes[i].getModifiers())) {
+                    resolved = create(paramTypes[i]);
+                }
+            }
+            if (resolved == null) {
+                throw new InjectionException("Could not resolve constructor parameter " + i 
+                    + " of type " + paramTypes[i].getName() + " for " + constructor.getDeclaringClass().getName());
+            }
+            params[i] = resolved;
+        }
+        
+        return constructor.newInstance(params);
     }
 
     /**

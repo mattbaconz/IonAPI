@@ -29,25 +29,28 @@ import java.util.function.Predicate;
  * Sign-based text input GUI.
  * Opens a virtual sign editor for the player to input text.
  * 
- * <p>Example usage:</p>
+ * <p>
+ * Example usage:
+ * </p>
+ * 
  * <pre>{@code
  * // Simple callback style
  * SignInput.create(plugin)
- *     .lines("", "Enter amount", "above", "")
- *     .onComplete((player, lines) -> {
- *         String input = lines.get(0);
- *         player.sendMessage("You entered: " + input);
- *     })
- *     .open(player);
+ *         .lines("", "Enter amount", "above", "")
+ *         .onComplete((player, lines) -> {
+ *             String input = lines.get(0);
+ *             player.sendMessage("You entered: " + input);
+ *         })
+ *         .open(player);
  * 
  * // CompletableFuture style
  * SignInput.create(plugin)
- *     .lines("", "Enter name", "", "")
- *     .openAsync(player)
- *     .thenAccept(lines -> {
- *         String name = lines.get(0);
- *         // Process input
- *     });
+ *         .lines("", "Enter name", "", "")
+ *         .openAsync(player)
+ *         .thenAccept(lines -> {
+ *             String name = lines.get(0);
+ *             // Process input
+ *         });
  * }</pre>
  */
 public class SignInput implements Listener {
@@ -137,20 +140,21 @@ public class SignInput implements Listener {
         return future;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSignChange(SignChangeEvent event) {
-        if (!event.getPlayer().equals(viewer)) return;
-        if (!event.getBlock().getLocation().equals(signLocation)) return;
+        if (!event.getPlayer().equals(viewer))
+            return;
+        if (!event.getBlock().getLocation().equals(signLocation))
+            return;
 
         event.setCancelled(true);
 
         // Get input lines
         List<String> inputLines = Arrays.asList(
-            getLine(event, 0),
-            getLine(event, 1),
-            getLine(event, 2),
-            getLine(event, 3)
-        );
+                getLine(event, 0),
+                getLine(event, 1),
+                getLine(event, 2),
+                getLine(event, 3));
 
         // Validate
         if (validator != null && !validator.test(inputLines)) {
@@ -176,7 +180,8 @@ public class SignInput implements Listener {
 
     private String getLine(SignChangeEvent event, int index) {
         Component line = event.line(index);
-        if (line == null) return "";
+        if (line == null)
+            return "";
         return PlainTextComponentSerializer.plainText().serialize(line);
     }
 
@@ -211,7 +216,7 @@ public class SignInput implements Listener {
      */
     public static class Builder {
         private final Plugin plugin;
-        private String[] lines = {"", "", "", ""};
+        private String[] lines = { "", "", "", "" };
         private BiConsumer<Player, List<String>> onComplete;
         private Consumer<Player> onCancel;
         private Predicate<List<String>> validator;
@@ -226,9 +231,9 @@ public class SignInput implements Listener {
          * Sets all 4 lines of the sign.
          */
         @NotNull
-        public Builder lines(@NotNull String line1, @NotNull String line2, 
-                           @NotNull String line3, @NotNull String line4) {
-            this.lines = new String[]{line1, line2, line3, line4};
+        public Builder lines(@NotNull String line1, @NotNull String line2,
+                @NotNull String line3, @NotNull String line4) {
+            this.lines = new String[] { line1, line2, line3, line4 };
             return this;
         }
 

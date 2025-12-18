@@ -1,6 +1,6 @@
 # 🔧 Troubleshooting Guide
 
-**Version**: 1.3.0 | Common issues and solutions when using IonAPI.
+**Version**: 1.5.0 | Common issues and solutions when using IonAPI.
 
 ---
 
@@ -18,7 +18,7 @@ plugins {
 }
 
 dependencies {
-    implementation("com.github.mattbaconz:IonAPI:1.4.0")
+    implementation("com.github.mattbaconz:IonAPI:1.5.0")
 }
 
 tasks.shadowJar {
@@ -121,10 +121,10 @@ See [SECURITY.md](../SECURITY.md) for details.
 
 **Problem:** Scoreboard flickers when updating.
 
-**Solution (v1.3.0):** IonScoreboard now uses per-line updates that eliminate flashing:
+**Solution (v1.5.0):** IonScoreboard now uses per-line updates that eliminate flashing:
 
 ```java
-// ✅ v1.3.0 - No flashing! Uses builder pattern
+// ✅ v1.5.0 - No flashing! Uses builder pattern
 IonScoreboard board = IonScoreboard.builder()
     .title("<gold>Stats")
     .line(15, "<yellow>Level: {level}")

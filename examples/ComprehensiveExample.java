@@ -121,7 +121,7 @@ public class ComprehensiveExample implements IonPlugin, Listener {
 
         // Load player data with Task Chain
         TaskChain.create(this)
-                .async(() -> {
+                .asyncSupply(() -> {
                     // Step 1: Load from database (async)
                     PlayerStats stats = database.find(PlayerStats.class, player.getUniqueId());
 

@@ -1,6 +1,8 @@
 package com.ionapi.npc.impl;
 
 import com.ionapi.npc.IonNPC;
+import com.ionapi.npc.adapter.NmsAdapter;
+import com.ionapi.npc.adapter.ReflectionNmsAdapter;
 import com.ionapi.npc.skin.SkinData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -17,24 +19,21 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
- * Packet-based NPC implementation using reflection for NMS access.
- * Works across multiple Minecraft versions.
+ * Packet-based NPC implementation using the Bridge pattern for NMS access.
+ * Works across multiple Minecraft versions via the NmsAdapter interface.
  */
 public class PacketNPC implements IonNPC, Listener {
 
     private static final AtomicInteger ENTITY_ID_COUNTER = new AtomicInteger(-1000);
-    private static final ReflectionHelper REFLECT = new ReflectionHelper();
 
     private final Plugin plugin;
+    private final NmsAdapter nmsAdapter;
     private final UUID uuid;
     private final int entityId;
     private final Object gameProfile;
@@ -48,8 +47,13 @@ public class PacketNPC implements IonNPC, Listener {
     private Component name;
     private boolean destroyed = false;
 
+    /**
+     * Creates a new PacketNPC with a custom NmsAdapter.
+     * This constructor allows for dependency injection of different NMS implementations.
+     */
     public PacketNPC(
         @NotNull Plugin plugin,
+        @NotNull NmsAdapter nmsAdapter,
         @NotNull Location location,
         @Nullable Component name,
         @Nullable String skinTexture,
@@ -60,6 +64,7 @@ public class PacketNPC implements IonNPC, Listener {
         int viewDistance
     ) {
         this.plugin = plugin;
+        this.nmsAdapter = nmsAdapter;
         this.location = location.clone();
         this.name = name;
         this.lookAtPlayer = lookAtPlayer;
@@ -76,12 +81,12 @@ public class PacketNPC implements IonNPC, Listener {
             : "NPC";
         if (displayName.length() > 16) displayName = displayName.substring(0, 16);
         
-        this.gameProfile = REFLECT.createGameProfile(uuid, displayName);
+        this.gameProfile = nmsAdapter.createGameProfile(uuid, displayName);
         
         // Apply skin
         String texture = skinTexture != null ? skinTexture : SkinData.STEVE.texture();
         String signature = skinSignature != null ? skinSignature : SkinData.STEVE.signature();
-        REFLECT.setSkin(gameProfile, texture, signature);
+        nmsAdapter.setSkin(gameProfile, texture, signature);
         
         // Register listener for persistent NPCs
         if (persistent) {
@@ -90,6 +95,25 @@ public class PacketNPC implements IonNPC, Listener {
         
         // Register with NPC manager for click handling
         NPCManager.register(this);
+    }
+
+    /**
+     * Creates a new PacketNPC with the default ReflectionNmsAdapter.
+     * This constructor maintains backwards compatibility.
+     */
+    public PacketNPC(
+        @NotNull Plugin plugin,
+        @NotNull Location location,
+        @Nullable Component name,
+        @Nullable String skinTexture,
+        @Nullable String skinSignature,
+        boolean lookAtPlayer,
+        @Nullable Consumer<Player> clickHandler,
+        boolean persistent,
+        int viewDistance
+    ) {
+        this(plugin, new ReflectionNmsAdapter(), location, name, skinTexture, skinSignature,
+             lookAtPlayer, clickHandler, persistent, viewDistance);
     }
 
     @Override
@@ -119,23 +143,23 @@ public class PacketNPC implements IonNPC, Listener {
         
         try {
             // Send player info packet
-            Object playerInfoPacket = REFLECT.createPlayerInfoPacket(gameProfile, entityId, uuid);
-            REFLECT.sendPacket(player, playerInfoPacket);
+            Object playerInfoPacket = nmsAdapter.createPlayerInfoPacket(gameProfile, entityId, uuid);
+            nmsAdapter.sendPacket(player, playerInfoPacket);
             
             // Send spawn packet
-            Object spawnPacket = REFLECT.createSpawnPacket(entityId, uuid, location);
-            REFLECT.sendPacket(player, spawnPacket);
+            Object spawnPacket = nmsAdapter.createSpawnPacket(entityId, uuid, location);
+            nmsAdapter.sendPacket(player, spawnPacket);
             
             // Send head rotation
-            Object headRotationPacket = REFLECT.createHeadRotationPacket(entityId, location.getYaw());
-            REFLECT.sendPacket(player, headRotationPacket);
+            Object headRotationPacket = nmsAdapter.createHeadRotationPacket(entityId, location.getYaw());
+            nmsAdapter.sendPacket(player, headRotationPacket);
             
             // Remove from tab list after delay
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (!destroyed && player.isOnline()) {
                     try {
-                        Object removePacket = REFLECT.createPlayerInfoRemovePacket(uuid);
-                        REFLECT.sendPacket(player, removePacket);
+                        Object removePacket = nmsAdapter.createPlayerInfoRemovePacket(uuid);
+                        nmsAdapter.sendPacket(player, removePacket);
                     } catch (Exception ignored) {}
                 }
             }, 20L);
@@ -162,8 +186,8 @@ public class PacketNPC implements IonNPC, Listener {
         if (!player.isOnline()) return;
         
         try {
-            Object destroyPacket = REFLECT.createDestroyPacket(entityId);
-            REFLECT.sendPacket(player, destroyPacket);
+            Object destroyPacket = nmsAdapter.createDestroyPacket(entityId);
+            nmsAdapter.sendPacket(player, destroyPacket);
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to hide NPC from " + player.getName() + ": " + e.getMessage());
         }
@@ -191,8 +215,8 @@ public class PacketNPC implements IonNPC, Listener {
             if (player == null) continue;
             
             try {
-                Object teleportPacket = REFLECT.createTeleportPacket(entityId, location);
-                REFLECT.sendPacket(player, teleportPacket);
+                Object teleportPacket = nmsAdapter.createTeleportPacket(entityId, location);
+                nmsAdapter.sendPacket(player, teleportPacket);
             } catch (Exception ignored) {}
         }
     }
@@ -224,11 +248,11 @@ public class PacketNPC implements IonNPC, Listener {
             if (player == null) continue;
             
             try {
-                Object rotationPacket = REFLECT.createRotationPacket(entityId, yaw, pitch);
-                REFLECT.sendPacket(player, rotationPacket);
+                Object rotationPacket = nmsAdapter.createRotationPacket(entityId, yaw, pitch);
+                nmsAdapter.sendPacket(player, rotationPacket);
                 
-                Object headPacket = REFLECT.createHeadRotationPacket(entityId, yaw);
-                REFLECT.sendPacket(player, headPacket);
+                Object headPacket = nmsAdapter.createHeadRotationPacket(entityId, yaw);
+                nmsAdapter.sendPacket(player, headPacket);
             } catch (Exception ignored) {}
         }
     }
@@ -249,8 +273,8 @@ public class PacketNPC implements IonNPC, Listener {
             if (player == null) continue;
             
             try {
-                Object animPacket = REFLECT.createAnimationPacket(entityId, animationId);
-                REFLECT.sendPacket(player, animPacket);
+                Object animPacket = nmsAdapter.createAnimationPacket(entityId, animationId);
+                nmsAdapter.sendPacket(player, animPacket);
             } catch (Exception ignored) {}
         }
     }

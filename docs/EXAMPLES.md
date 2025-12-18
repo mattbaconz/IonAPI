@@ -1,6 +1,6 @@
 # 💡 IonAPI Examples
 
-**Version**: 1.3.0 | Quick, practical examples to get you started fast.
+**Version**: 1.5.0 | Quick, practical examples to get you started fast.
 
 ---
 
@@ -87,7 +87,7 @@ public void openProfile(Player player) {
 
 ---
 
-## 📊 Scoreboard (v1.3.0 - No Flashing!)
+## 📊 Scoreboard (v1.5.0 - No Flashing!)
 
 ### Dynamic Stats
 ```java
@@ -314,7 +314,7 @@ For more detailed examples, see:
 
 ---
 
-## 🆕 v1.3.0 Features
+## 🆕 v1.5.0 Features
 
 ### ConfirmationGui
 

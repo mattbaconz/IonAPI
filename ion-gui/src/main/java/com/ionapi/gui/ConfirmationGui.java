@@ -110,6 +110,9 @@ public class ConfirmationGui {
     }
 
     private void buildGui() {
+        // Flag to track if confirm/cancel was already handled
+        final boolean[] handled = { false };
+
         IonGuiBuilder builder = IonGui.builder()
                 .title(title)
                 .rows(rows);
@@ -143,6 +146,9 @@ public class ConfirmationGui {
 
         // Add confirm button
         builder.item(confirmSlot, confirmItem, click -> {
+            if (handled[0])
+                return;
+            handled[0] = true;
             if (confirmSound != null) {
                 confirmSound.play(click.getPlayer());
             }
@@ -154,6 +160,9 @@ public class ConfirmationGui {
 
         // Add cancel button
         builder.item(cancelSlot, cancelItem, click -> {
+            if (handled[0])
+                return;
+            handled[0] = true;
             if (cancelSound != null) {
                 cancelSound.play(click.getPlayer());
             }
@@ -163,9 +172,9 @@ public class ConfirmationGui {
             }
         });
 
-        // Handle close as cancel
+        // Handle close as cancel (only if not already handled by button click)
         builder.onCloseHandler(event -> {
-            if (onCancel != null) {
+            if (onCancel != null && !handled[0]) {
                 // Use scheduler to avoid issues with closing during event
                 org.bukkit.Bukkit.getScheduler().runTask(
                         org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(ConfirmationGui.class),
