@@ -91,6 +91,6 @@ public interface IonPlugin {
      */
     @NotNull
     default String getIonVersion() {
-        return "1.2.6";
+        return "1.5.0";
     }
 }
