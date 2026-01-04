@@ -1,0 +1,15 @@
+{
+    "title": "IonAPI Documentation",
+    "description": "Comprehensive documentation for IonAPI",
+    "author": "MattBaconz",
+    "language": "en",
+    "structure": {
+        "readme": "README.md",
+        "summary": "SUMMARY.md"
+    },
+    "plugins": [
+        "prism",
+        "-sharing",
+        "search"
+    ]
+}
